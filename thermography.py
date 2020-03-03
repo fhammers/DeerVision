@@ -7,7 +7,8 @@
 import cv2
 import numpy as np
 import time
-import tkinter as tk
+import tkinter as Tk
+from tkinter.filedialog import askopenfilename
 
 PROJECT_NAME = 'IR Thermal Processing'
 
@@ -22,11 +23,11 @@ minThresh = 100
 # Playback var
 FPS = 90
 
-tkinter.withdraw()
+#Tk().withdraw()
 
 # Video source path
-vidURL = askopenfilename() # Prompt for video selection
-#vidURL = r'C:\Users\Michael\OneDrive\Juniata\Advanced Lab\IR\video\test.mov'
+#vidURL = askopenfilename() # Prompt for video selection
+vidURL = r'C:\Users\Michael\OneDrive\Juniata\Advanced Lab\IR\video\test.mov'
 
 # Bind video file
 cap = cv2.VideoCapture(vidURL)
