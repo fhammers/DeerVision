@@ -11,12 +11,12 @@ import sys
 #Sets stitching modes for OpenCV methods
 modes = (cv2.Stitcher_PANORAMA, cv2.Stitcher_SCANS)
 
-#Command line arguments 
+#Command line arguments:
 # --mode (1 or 2) - 1 for panorama .. 2 for scans - panorama is default
 # help - displays possible commands
 # --output (filename) - specify filename for output - result.jpg is default
-# img + img2 .. - add as many images to stitch
-parser = argparse.ArgumentParser(prog = 'stitching.py', description = 'Stitching sample.')
+# img + img2 + .. - add as many images to stitch
+parser = argparse.ArgumentParser(prog = 'stitcher.py', description = 'Stitching sample.')
 parser.add_argument(' -- mode', 
     type = int, choices = modes, default = cv2.Stitcher_PANORAMA, 
     help = 'Determines configuration of stitcher. The default is `PANORAMA` (%d), '
@@ -26,8 +26,8 @@ parser.add_argument(' -- output', default = 'result.jpg',
     help = 'Resulting image. The default is `result.jpg`.')
 parser.add_argument('img', nargs = '+', help = 'input images')
 
-# Adds argument documentation to scripts print command
-__doc__ += '\n' + parser.format_help()
+# Adds argument documentation to script's print command
+#__doc__ += '\n' + parser.format_help()
 
 #Main function
 def main():
