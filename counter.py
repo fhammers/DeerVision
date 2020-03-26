@@ -26,8 +26,9 @@ params.filterByArea = True
 params.minArea = 100
   
 # Set Circularity filtering parameters (4*pi*Area/perimiter^2, circle = 1)
-params.filterByCircularity = False 
-params.minCircularity = 0.9
+params.filterByCircularity = True 
+params.minCircularity = 0.55
+params.maxCircularity = 0.9
   
 # Set Convexity filtering parameters 
 params.filterByConvexity = True
@@ -35,8 +36,8 @@ params.minConvexity = 0.87
       
 # Set inertia filtering parameters (How circular the object is: 1 = circle, 0 = line) 
 params.filterByInertia = True
-params.minInertiaRatio = 0.01
-params.maxInertiaRatio = 0.5
+params.minInertiaRatio = 0.05
+params.maxInertiaRatio = 0.6
   
 # Create a detector with the parameters
 ver = (cv2.__version__).split('.')
@@ -58,7 +59,7 @@ number_of_blobs = len(keypoints)
 # cv2.putText(blobs, text, (20, 550), 
 #             cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 100, 255), 2) 
 
-print("Number of objects detected: " + str(number_of_blobs)  
+print("Number of objects detected: " + str(len(keypoints)))  
 
 # Show blobs 
 cv2.imshow("Filtering Circular Blobs Only", blobs) 
