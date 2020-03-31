@@ -23,7 +23,7 @@ def scraper():
     dirs = os.listdir(source)
 
     for file in dirs:
-        if file.split('.')[0][-1] == 'R':
+        if file.split('.')[-2][-1] == 'R':
             file_path = source + '/' + file
             shutil.copy(file_path, destination)
             
