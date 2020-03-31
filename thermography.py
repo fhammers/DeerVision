@@ -1,51 +1,34 @@
-# 
-# Thermal Imagine Script
-# Michael Young
-# Advanced Lab
-# 
-
 import cv2
 import numpy as np
-import time
-import tkinter as Tk
-from tkinter.filedialog import askopenfilename
+from matplotlib import pyplot as plt
 
-PROJECT_NAME = 'IR Thermal Processing'
 
-# Image resizes
-RESIZE_FAC = 0.8
+def MinThreshold(URL, minThresh=200, maxThresh=255):
 
-# Canny delta thresholds
-CANNY_MAX = 255
-maxThresh = 250
-minThresh = 100
+    img = cv2.imread(URL,0)
 
-# Playback var
-FPS = 30
+    ret,thresh1 = cv2.threshold(img,minThresh,maxThresh,cv2.THRESH_BINARY)
+    ret,thresh2 = cv2.threshold(img,minThresh,maxThresh,cv2.THRESH_BINARY_INV)
+    ret,thresh3 = cv2.threshold(img,minThresh,maxThresh,cv2.THRESH_TRUNC)
+    ret,thresh4 = cv2.threshold(img,minThresh,maxThresh,cv2.THRESH_TOZERO)
+    ret,thresh5 = cv2.threshold(img,minThresh,maxThresh,cv2.THRESH_TOZERO_INV)
 
-#Tk().withdraw()
+    titles = ['Original Image','BINARY','BINARY_INV','TRUNC','TOZERO','TOZERO_INV']
 
-# Video source path
-vidURL = askopenfilename() # Prompt for video selection
-#vidURL = r'C:\Users\Michael\OneDrive\Juniata\Advanced Lab\IR\video\test.mov'
+    images = [img, thresh1, thresh2, thresh3, thresh4, thresh5]
 
-# Bind video file
-cap = cv2.VideoCapture(vidURL)
+    for i in range(6):
+        plt.subplot(2,3,i+1),plt.imshow(images[i],'gray')
+        plt.title(titles[i])
+        plt.xticks([]),plt.yticks([])
 
-VID_FRAMES = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
+    return plt
 
-def OnTrackbar(val):
-    cap.set(cv2.CAP_PROP_POS_FRAMES, val)
-    ret, frame = cap.read()
-    view = CreateFrames(frame)
-    cv2.imshow(PROJECT_NAME, view)
-    return
-
-def CreateFrames(frame):
+def CreateFrames(frame, MINTHRESH=100, MAXTHRESH=255, FPS=30, RESIZE_FAC = 0.8):
 
     # Create canny
     gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-    canny = cv2.Canny(gray, minThresh, maxThresh)
+    canny = cv2.Canny(gray, MINTHRESH, MAXTHRESH)
 
     # Negative frame (bits flipped)
     neg = ~frame
@@ -69,39 +52,3 @@ def CreateFrames(frame):
 
     # Update stacked view
     return stacked
-
-# Create window
-cv2.namedWindow(PROJECT_NAME, cv2.WINDOW_AUTOSIZE)
-
-# Create trackbars
-cv2.createTrackbar('Frame', PROJECT_NAME, 0, VID_FRAMES, OnTrackbar)
-
-
-while(True):
-
-    # Check for user input during playback
-    key = cv2.waitKey(1)
-
-    if key == ord('q'): #quits
-        break
-
-    if key == ord('p'): #pauses
-        cv2.waitKey(-1) #waits until another key is pressed
-
-    # Get next frame from feed
-    ret, frame = cap.read()
-
-    # Perform cv2 operations
-    view = CreateFrames(frame)
-
-    cv2.imshow(PROJECT_NAME, view)
-
-    # FPS Controller (kinda)
-    time.sleep(1/FPS)
-
-
-# Release binds and destroy for clean exit
-cap.release()
-cv2.destroyAllWindows()
-
-print("Finished")
