@@ -21,13 +21,13 @@ maxThresh = 250
 minThresh = 100
 
 # Playback var
-FPS = 90
+FPS = 30
 
 #Tk().withdraw()
 
 # Video source path
-#vidURL = askopenfilename() # Prompt for video selection
-vidURL = r'C:\Users\Michael\OneDrive\Juniata\Advanced Lab\IR\video\test.mov'
+vidURL = askopenfilename() # Prompt for video selection
+#vidURL = r'C:\Users\Michael\OneDrive\Juniata\Advanced Lab\IR\video\test.mov'
 
 # Bind video file
 cap = cv2.VideoCapture(vidURL)
@@ -43,12 +43,12 @@ def OnTrackbar(val):
 
 def CreateFrames(frame):
 
-    # Negative frame (bits flipped)
-    neg = ~frame
-
     # Create canny
     gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
     canny = cv2.Canny(gray, minThresh, maxThresh)
+
+    # Negative frame (bits flipped)
+    neg = ~frame
 
     # Convert canny to correct color dimensionality
     canny3d = cv2.cvtColor(canny, cv2.COLOR_GRAY2BGR)
