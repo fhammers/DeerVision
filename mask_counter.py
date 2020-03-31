@@ -11,41 +11,59 @@ from tkinter.filedialog import askopenfilename
 
 def counter(filepath = "blah"):
 	# Hide root Tk window 
-	root = Tk()
-	root.withdraw()
+	# root = Tk()
+	# root.withdraw()
 
-	#Ask user for file
-	picURL = askopenfilename()
-	root.destroy()
+	# #Ask user for file
+	# picURL = askopenfilename()
+	# root.destroy()
 
-	#store image path
-	image = cv2.imread(picURL,0)
+	# #store image path
+	image = cv2.imread("C:\\Users\\Martin Berger\\Desktop\\DJI_0693_R.jpg")
+	mask_blur = image
+
+	# Creating a mask from red pixels
+	result = image.copy()
+	image = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
+	mask = cv2.inRange(image, (0,100,170), (70,255,255))
+	result = cv2.bitwise_and(result, result, mask=mask)
+	blur = cv2.GaussianBlur(result,(3,3),0)
+	mask_blur = cv2.GaussianBlur(mask,(7,7),0)
+
+	cv2.imshow('mask_blur', mask_blur)
+	cv2.imshow('mask', mask)
+	# cv2.imshow('result', blur)
+	cv2.waitKey()
 	
 	# Set filtering parameters 
 	# Initialize parameter settiing using cv2.SimpleBlobDetector 
 	params = cv2.SimpleBlobDetector_Params() 
 	
 	# Change thresholds
-	params.minThreshold = 50
+	params.minThreshold = 240
 	params.maxThreshold = 255
+
+	# Set Color filtering parameters
+	# params.filterByColor = True
+	# params.blobColor = 
 
 	# Set Area filtering parameters (Area in pixels)
 	params.filterByArea = True
-	params.minArea = 20
+	params.minArea = 5
 	
 	# Set Circularity filtering parameters (4*pi*Area/perimiter^2, circle = 1)
 	params.filterByCircularity = True 
-	params.minCircularity = 0.55
+	params.minCircularity = .2
 	params.maxCircularity = 0.9
 	
 	# Set Convexity filtering parameters 
-	params.filterByConvexity = True
-	params.minConvexity = 0.6
+	params.filterByConvexity = False
+	params.minConvexity = 0.1
 		
 	# Set inertia filtering parameters (How circular the object is: 1 = circle, 0 = line) 
-	params.filterByInertia = True
-	params.minInertiaRatio = 0.05
-	params.maxInertiaRatio = 0.8
+	params.filterByInertia = False
+	params.minInertiaRatio = 0.01
+	params.maxInertiaRatio = 0.99
 	
 	# Create a detector with the parameters
 	ver = (cv2.__version__).split('.')
@@ -55,11 +73,11 @@ def counter(filepath = "blah"):
 		detector = cv2.SimpleBlobDetector_create(params) 
 		
 	# Detect blobs 
-	keypoints = detector.detect(image) 
+	keypoints = detector.detect(mask_blur) 
 	
 	# Draw blobs on our image as red circles 
 	blank = np.zeros((1, 1))  
-	blobs = cv2.drawKeypoints(image, keypoints, blank, (0, 0, 255),
+	blobs = cv2.drawKeypoints(mask_blur, keypoints, blank, (0, 0, 255),
 				cv2.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS) 
 	
 	number_of_blobs = len(keypoints) 
