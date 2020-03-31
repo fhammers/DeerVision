@@ -59,9 +59,9 @@ number_of_blobs = len(keypoints)
 # cv2.putText(blobs, text, (20, 550), 
 #             cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 100, 255), 2) 
 
-print("Number of objects detected: " + str(len(keypoints)))  
+print("Number of deer detected: " + str(len(keypoints)))  
 
 # Show blobs 
-cv2.imshow("Filtering Circular Blobs Only", blobs) 
+cv2.imshow("Checking for Deer", blobs) 
 cv2.waitKey(0) 
 cv2.destroyAllWindows() 
