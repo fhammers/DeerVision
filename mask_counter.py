@@ -11,7 +11,7 @@ from matplotlib import pyplot as plt
 from tkinter import Tk
 from tkinter.filedialog import askopenfilename
 
-def mask(filepath = "WhatGoesHere"):
+def mask():
 	# Hide root Tk window 
 	root = Tk()
 	root.withdraw()
@@ -28,6 +28,7 @@ def mask(filepath = "WhatGoesHere"):
 	# Creating a mask from red pixels
 	result = image.copy()
 	image = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
+
 	# Sets the color that is being masked using HSV color format
 	mask = cv2.inRange(image, (0,0,200), (70,1,255))
 	result = cv2.bitwise_and(result, result, mask=mask)
@@ -39,11 +40,12 @@ def mask(filepath = "WhatGoesHere"):
 	# cv2.imshow('result', blur)
 	cv2.waitKey()
 
-mask() 
+	return mask
 
-def counter(filepath = "blah"):
-	import 
-	
+
+def counter(): 
+	image = mask()
+
 	# Set filtering parameters 
 	# Initialize parameter settiing using cv2.SimpleBlobDetector 
 	params = cv2.SimpleBlobDetector_Params() 
@@ -82,11 +84,11 @@ def counter(filepath = "blah"):
 		detector = cv2.SimpleBlobDetector_create(params) 
 		
 	# Detect blobs 
-	keypoints = detector.detect(mask) 
+	keypoints = detector.detect(image) 
 	
 	# Draw blobs on our image as red circles 
 	blank = np.zeros((1, 1))  
-	blobs = cv2.drawKeypoints(mask, keypoints, blank, (0, 0, 255),
+	blobs = cv2.drawKeypoints(image, keypoints, blank, (0, 0, 255),
 				cv2.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS) 
 	
 	number_of_blobs = len(keypoints) 
