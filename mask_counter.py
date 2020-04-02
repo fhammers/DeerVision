@@ -11,31 +11,38 @@ from matplotlib import pyplot as plt
 from tkinter import Tk
 from tkinter.filedialog import askopenfilename
 
-def counter(filepath = "blah"):
+def mask(filepath = "WhatGoesHere"):
 	# Hide root Tk window 
-	# root = Tk()
-	# root.withdraw()
+	root = Tk()
+	root.withdraw()
 
-	# #Ask user for file
-	# picURL = askopenfilename()
-	# root.destroy()
+	# Ask user for file
+	picURL = askopenfilename()
+	root.destroy()
+	
+	# Grab file
+	# image = cv2.imread("C:\\Users\\Martin Berger\\Desktop\\DJI_0315_R.jpg")
+	image = cv2.imread(picURL)
 
-	# #store image path
-	image = cv2.imread("C:\\Users\\Martin Berger\\Desktop\\DJI_0693_R.jpg")
-	mask_blur = image
 
 	# Creating a mask from red pixels
 	result = image.copy()
 	image = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
-	mask = cv2.inRange(image, (0,100,170), (70,255,255))
+	# Sets the color that is being masked using HSV color format
+	mask = cv2.inRange(image, (0,0,200), (70,1,255))
 	result = cv2.bitwise_and(result, result, mask=mask)
-	blur = cv2.GaussianBlur(result,(3,3),0)
-	mask_blur = cv2.GaussianBlur(mask,(7,7),0)
+	# blur = cv2.GaussianBlur(result,(3,3),0)
+	# mask_blur = cv2.GaussianBlur(mask,(7,7),0)
 
-	cv2.imshow('mask_blur', mask_blur)
+	# cv2.imshow('mask_blur', mask_blur)
 	cv2.imshow('mask', mask)
 	# cv2.imshow('result', blur)
 	cv2.waitKey()
+
+mask() 
+
+def counter(filepath = "blah"):
+	import 
 	
 	# Set filtering parameters 
 	# Initialize parameter settiing using cv2.SimpleBlobDetector 
@@ -51,7 +58,7 @@ def counter(filepath = "blah"):
 
 	# Set Area filtering parameters (Area in pixels)
 	params.filterByArea = True
-	params.minArea = 2
+	params.minArea = 3
 	
 	# Set Circularity filtering parameters (4*pi*Area/perimiter^2, circle = 1)
 	params.filterByCircularity = False 
