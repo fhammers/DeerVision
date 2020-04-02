@@ -40,19 +40,19 @@ def counter(filepath = "blah"):
 	params = cv2.SimpleBlobDetector_Params() 
 	
 	# Change thresholds
-	params.minThreshold = 240
+	params.minThreshold = 10
 	params.maxThreshold = 255
 
 	# Set Color filtering parameters
-	# params.filterByColor = True
-	# params.blobColor = 
+	params.filterByColor = True
+	params.blobColor = 255
 
 	# Set Area filtering parameters (Area in pixels)
 	params.filterByArea = True
-	params.minArea = 5
+	params.minArea = 2
 	
 	# Set Circularity filtering parameters (4*pi*Area/perimiter^2, circle = 1)
-	params.filterByCircularity = True 
+	params.filterByCircularity = False 
 	params.minCircularity = .2
 	params.maxCircularity = 0.9
 	
@@ -73,11 +73,11 @@ def counter(filepath = "blah"):
 		detector = cv2.SimpleBlobDetector_create(params) 
 		
 	# Detect blobs 
-	keypoints = detector.detect(mask_blur) 
+	keypoints = detector.detect(mask) 
 	
 	# Draw blobs on our image as red circles 
 	blank = np.zeros((1, 1))  
-	blobs = cv2.drawKeypoints(mask_blur, keypoints, blank, (0, 0, 255),
+	blobs = cv2.drawKeypoints(mask, keypoints, blank, (0, 0, 255),
 				cv2.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS) 
 	
 	number_of_blobs = len(keypoints) 

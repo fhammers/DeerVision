@@ -31,16 +31,16 @@ def counter(filepath = "blah"):
 
 	# Set Area filtering parameters (Area in pixels)
 	params.filterByArea = True
-	params.minArea = 20
+	params.minArea = 300
 	
 	# Set Circularity filtering parameters (4*pi*Area/perimiter^2, circle = 1)
 	params.filterByCircularity = True 
-	params.minCircularity = 0.55
+	params.minCircularity = 0.45
 	params.maxCircularity = 0.9
 	
 	# Set Convexity filtering parameters 
 	params.filterByConvexity = True
-	params.minConvexity = 0.6
+	params.minConvexity = 0.95
 		
 	# Set inertia filtering parameters (How circular the object is: 1 = circle, 0 = line) 
 	params.filterByInertia = True
