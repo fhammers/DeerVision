@@ -1,7 +1,9 @@
-#Martin Berger
-#Advanced Lab
-#This program will count the number of deer that appear in a stiched image
-
+# Martin Berger
+# Advanced Lab
+# This program will count the number of deer that appear in a stiched image
+# It uses a mask to filter to red spots (deer or other high heat objects)
+# then uses SimpleBlobDetector from OpenCV to count the number of deer in the
+# image.
 
 import cv2 as cv2
 import numpy as np
