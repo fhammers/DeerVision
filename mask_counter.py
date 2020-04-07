@@ -6,24 +6,16 @@
 # image.
 
 import cv2 as cv2
+import sys
 import numpy as np
 from matplotlib import pyplot as plt
 from tkinter import Tk
 from tkinter.filedialog import askopenfilename
 
-def mask():
-	# Hide root Tk window 
-	root = Tk()
-	root.withdraw()
-
-	# Ask user for file
-	picURL = askopenfilename()
-	root.destroy()
-	
+def mask(URL):
 	# Grab file
 	# image = cv2.imread("C:\\Users\\Martin Berger\\Desktop\\DJI_0315_R.jpg")
-	image = cv2.imread(picURL)
-
+	image = cv2.imread(URL)
 
 	# Creating a mask from red pixels
 	result = image.copy()
@@ -42,9 +34,8 @@ def mask():
 
 	return mask
 
-
-def counter(): 
-	image = mask()
+def counter(URL): 
+	image = image = cv2.imread(URL)
 
 	# Set filtering parameters 
 	# Initialize parameter settiing using cv2.SimpleBlobDetector 
@@ -104,4 +95,18 @@ def counter():
 	cv2.waitKey(0) 
 	cv2.destroyAllWindows() 
 
-counter()
+def main():
+		# Hide root Tk window 
+	root = Tk()
+	root.withdraw()
+
+	# Ask user for file
+	picURL = askopenfilename()
+	root.destroy()
+	try:
+		counter(picURL)
+	except :
+		print("Unexpected error:", sys.exc_info())
+
+if __name__ == "__main__":
+	main()
