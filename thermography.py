@@ -26,7 +26,7 @@ def ExampleThreshold(URL, minThresh=200, maxThresh=255):
 
     return plt
 
-def CreateFrames(frame, MINTHRESH=100, MAXTHRESH=255, FPS=30, RESIZE_FAC = 0.8):
+def CreateFrames(frame, MINTHRESH=100, MAXTHRESH=255, RESIZE_FAC = 0.8):
 
     # Create canny
     gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)

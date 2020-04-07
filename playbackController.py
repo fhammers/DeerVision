@@ -14,7 +14,7 @@ def OnVidTrackbar(val):
     cv2.imshow(PROJECT_NAME, view)
     return
 
-def ShowVideo(URL):
+def ShowVideo(URL, FPS=30):
     # Bind video file
     cap = cv2.VideoCapture(URL)
     VID_FRAMES = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
