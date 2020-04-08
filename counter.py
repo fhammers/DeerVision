@@ -3,7 +3,7 @@
 #This program will count the number of deer that appear in a stiched image
 
 
-import cv2 as cv2
+import cv2
 import numpy as np
 from matplotlib import pyplot as plt
 from tkinter import Tk
