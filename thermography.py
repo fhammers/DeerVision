@@ -1,9 +1,11 @@
 import cv2
 import numpy as np
 from matplotlib import pyplot as plt
+from tkinter import Tk
+from tkinter.filedialog import askopenfilename
 
 
-def MinThreshold(URL, minThresh=200, maxThresh=255):
+def ExampleThreshold(URL, minThresh=200, maxThresh=255):
 
     img = cv2.imread(URL,0)
 
@@ -52,3 +54,18 @@ def CreateFrames(frame, MINTHRESH=100, MAXTHRESH=255, RESIZE_FAC = 0.8):
 
     # Update stacked view
     return stacked
+
+def main():
+    #destroy root tk window
+    Tk().withdraw()
+
+    # Video source path
+    URL = askopenfilename() # Prompt for video selection
+    ExampleThreshold(URL).show()
+
+    #root.destroy() #destroy tkinter
+
+    print("EXIT - clean")
+
+if __name__ == "__main__":
+    main()
