@@ -22,7 +22,8 @@ def mask(URL):
 	image = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
 
 	# Sets the color that is being masked using HSV color format
-	mask = cv2.inRange(image, (0,0,200), (70,1,255))
+	# mask = cv2.inRange(image, (0,50,200), (50,180,255)) #Red
+	mask = cv2.inRange(image, (0,0,200), (70,1,255)) #White
 	result = cv2.bitwise_and(result, result, mask=mask)
 	# blur = cv2.GaussianBlur(result,(3,3),0)
 	# mask_blur = cv2.GaussianBlur(mask,(7,7),0)
@@ -90,7 +91,7 @@ def counter(URL):
 	print("Number of objects detected: " + str(number_of_blobs))  
 
 	# Show blobs 
-	cv2.imshow("Filtering Circular Blobs Only", blobs) 
+	cv2.imshow("Checking for Deer", blobs) 
 	cv2.imwrite("test.jpg", blobs)
 	cv2.waitKey(0) 
 	cv2.destroyAllWindows() 
