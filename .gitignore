@@ -1,4 +1,2 @@
 /Thermal
-.vscode/settings.json
-.vscode
-__pycache__
+/internal
