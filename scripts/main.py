@@ -35,3 +35,6 @@ def main:
     #have a button on gui that takes you to where new image where deer displayed is found
 
     #clean up tkinter and exit
+
+if __name__ == "__main__":
+    main()
