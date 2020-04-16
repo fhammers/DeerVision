@@ -107,6 +107,8 @@ def main():
 	try:
 		# counter(picURL)
 		image,deer_num = counter(picURL)
+
+		# Display the image and the number of deer counted
 		cv2.imshow("Final Count", image) 
 		cv2.imwrite("test.jpg", image)
 		print("Number of deer detected: " + str(deer_num))
