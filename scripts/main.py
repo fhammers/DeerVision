@@ -51,17 +51,6 @@ if __name__ == "__main__":
 
 
 
-
-
-
-
-
-
-
-
-def main():
-    pass
-
     ## start tkinkter root window
     ## gui calls here
     #startGUI()
