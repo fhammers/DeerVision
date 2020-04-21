@@ -51,17 +51,6 @@ if __name__ == "__main__":
 
 
 
-
-
-
-
-
-
-
-
-def main():
-    pass
-
     ## start tkinkter root window
     ## gui calls here
     #startGUI()
@@ -91,6 +80,3 @@ def main():
     #have a button on gui that takes you to where new image where deer displayed is found
 
     #clean up tkinter and exit
-
-if __name__ == "__main__":
-    main()
