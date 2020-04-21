@@ -70,7 +70,8 @@ Please read [CONTRIBUTING.md](https://gist.github.com/PurpleBooth/b24679402957c6
 * **Michael Young** - *Initial work* - [michaellyoungg](https://github.com/michaellyoungg)
 * **Martin Berger** - *Computer Vision algorithms* - [Mautty97](https://github.com/Mautty97)
 * **Kaleb Gebrekirstos** - *Front end and overall commits* - [ksgebrekirstos98](https://github.com/ksgebrekirstos98)
-* **Beakal Tiliksew Teshome** - *Backend cloud confiuragtion and API's* - [btree1970](https://github.com/btree1970)
+* **Beakal Tiliksew Teshome** - *Back end cloud confiuragtion and API's* - [btree1970](https://github.com/btree1970)
+* **Charles Kovach** - *Computer Vision algorithms* - [charliekovach](https://github.com/charliekovach)
 
 See also the list of [contributors](https://github.com/michaellyoungg/DeerVision/graphs/contributors) who participated in this project.
 
