@@ -1,10 +1,66 @@
 ## main execution script, first run through
+from tkinter import *
+from tkinter import filedialog
 
-#do we put regular imports here or leave in separate scripts?
 
-#throughout main we need to run try catch blocks and try to handle as many errors as possible
 
-def main:
+
+
+
+
+class DeerVision:
+    def __init__(self):
+         
+        self.list_dir =  ""
+
+
+        #initialize tkinter window
+        self.window = Tk()
+        self.window.title("Deer Vision")
+        self.window.geometry('600x200')
+        btn = Button(self.window, text="Browse", command = self.load_file, width = 10).pack()
+
+
+    def start(self):
+        self.window.mainloop()
+
+
+    
+    def load_file(self):
+        file_name = filedialog.askdirectory()
+
+        if file_name:
+            self.list_dir = file_name
+
+
+
+
+def load_file():
+    pass
+
+
+
+# btn.grid(column=10, row=10)
+
+if __name__ == "__main__":
+    deer_process = DeerVision()
+
+    
+
+    deer_process.start()
+
+
+
+
+
+
+
+
+
+
+
+def main():
+    pass
 
     ## start tkinkter root window
     ## gui calls here
