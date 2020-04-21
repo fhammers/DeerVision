@@ -54,35 +54,32 @@ Give an example
 
 ## Deployment
 
-Add additional notes about how to deploy this on a live system
+One time release to Remote Intelligence clients.
 
 ## Built With
 
-* [Dropwizard](http://www.dropwizard.io/1.0.2/docs/) - The web framework used
-* [Maven](https://maven.apache.org/) - Dependency Management
-* [ROME](https://rometools.github.io/rome/) - Used to generate RSS Feeds
+* [OpenCV](https://opencv.org/) - Computer vision library
+* [WebODM](https://www.opendronemap.org/webodm/) - Open source drone cloud service used for thermal image stitching
 
 ## Contributing
 
 Please read [CONTRIBUTING.md](https://gist.github.com/PurpleBooth/b24679402957c63ec426) for details on our code of conduct, and the process for submitting pull requests to us.
 
-## Versioning
-
-We use [SemVer](http://semver.org/) for versioning. For the versions available, see the [tags on this repository](https://github.com/your/project/tags). 
-
 ## Authors
 
-* **Billie Thompson** - *Initial work* - [PurpleBooth](https://github.com/PurpleBooth)
+* **Michael Young** - *Initial work* - [michaellyoungg](https://github.com/michaellyoungg)
+* **Martin Berger** - *Computer Vision algorithms* - [Mautty97](https://github.com/Mautty97)
+* **Kaleb Gebrekirstos** - *Front end and overall commits* - [ksgebrekirstos98](https://github.com/ksgebrekirstos98)
+* **Beakal Tiliksew Teshome** - *Backend cloud confiuragtion and API's* - [btree1970](https://github.com/btree1970)
 
-See also the list of [contributors](https://github.com/your/project/contributors) who participated in this project.
+See also the list of [contributors](https://github.com/michaellyoungg/DeerVision/graphs/contributors) who participated in this project.
 
 ## License
 
-This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details
+This project is licensed under the MIT License - see the [LICENSE.md](https://github.com/michaellyoungg/DeerVision/blob/master/LICENSE) file for details
 
 ## Acknowledgments
 
 * Hat tip to anyone whose code was used
-* Inspiration
-* etc
+* Inspiration was to save the deer by elevating population reporting
 
