@@ -1,6 +1,3 @@
-'''
-Scraping images from Google Drive and then storing them for later use
-'''
 import os 
 import shutil 
 import logging
@@ -27,7 +24,7 @@ def scraper():
 
     source = askdirectory() #'../deer-images' change directory name here according to relative directory needed 
     destination = askdirectory() #'../processed-deer-images' # same thing here
-
+    
     root.destroy() # destroy Tk windows - tidy cleanup
 
     dirs = os.listdir(source)
@@ -61,7 +58,7 @@ def sortImages(src):
 
     for folder, subdirs, files in os.walk(directory, topdown=False):
         
-        logging.info('In subdirectory: {0}'.format(folder))
+        logging.info(' In subdirectory: {0}'.format(folder))
 
         for filename in files:
             if filename.split('.')[-1] == 'jpg' or 'JPG':
