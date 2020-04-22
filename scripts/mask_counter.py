@@ -22,7 +22,9 @@ def mask(URL):
 	image = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
 
 	# Sets the color that is being masked using HSV color format
-	mask = cv2.inRange(image, (0,0,200), (70,1,255))
+	
+	# mask = cv2.inRange(image, (0,50,200), (50,180,255)) #Red
+	mask = cv2.inRange(image, (0,0,200), (70,3,255)) #White
 	result = cv2.bitwise_and(result, result, mask=mask)
 	# blur = cv2.GaussianBlur(result,(3,3),0)
 	# mask_blur = cv2.GaussianBlur(mask,(7,7),0)
@@ -35,7 +37,8 @@ def mask(URL):
 	return mask
 
 def counter(URL): 
-	image = image = cv2.imread(URL)
+	#image = cv2.imread(URL)
+	image = mask(URL)
 
 	# Set filtering parameters 
 	# Initialize parameter settiing using cv2.SimpleBlobDetector 
@@ -83,17 +86,15 @@ def counter(URL):
 				cv2.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS) 
 	
 	number_of_blobs = len(keypoints) 
-	# text = "Number of Circular Blobs: " + str(len(keypoints)) 
-	# cv2.putText(blobs, text, (20, 550), 
-	#             cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 100, 255), 2) 
 
-	print("Number of objects detected: " + str(number_of_blobs))  
+	# print("Number of deer detected: " + str(number_of_blobs))  
+	return(blobs,number_of_blobs)
 
 	# Show blobs 
-	cv2.imshow("Filtering Circular Blobs Only", blobs) 
-	cv2.imwrite("test.jpg", blobs)
-	cv2.waitKey(0) 
-	cv2.destroyAllWindows() 
+	# cv2.imshow("Final Count", blobs) 
+	# cv2.imwrite("test.jpg", blobs)
+	# cv2.waitKey(0) 
+	# cv2.destroyAllWindows() 
 
 def main():
 		# Hide root Tk window 
@@ -104,7 +105,18 @@ def main():
 	picURL = askopenfilename()
 	root.destroy()
 	try:
-		counter(picURL)
+		# counter(picURL)
+		image,deer_num = counter(picURL)
+
+		# Display the image and the number of deer counted
+		cv2.imshow("Final Count", image) 
+		cv2.imwrite("test.jpg", image)
+		print("Number of deer detected: " + str(deer_num))
+
+		cv2.waitKey(0) 
+		cv2.destroyAllWindows() 
+		
+
 	except :
 		print("Unexpected error:", sys.exc_info())
 
