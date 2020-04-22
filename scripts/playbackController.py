@@ -3,7 +3,6 @@ import numpy as np
 import time
 from tkinter import Tk
 from tkinter.filedialog import askopenfilename
-from thermography import CreateFrames
 
 PROJECT_NAME = 'IR Thermal Processing'
 
@@ -52,8 +51,6 @@ def ShowVideo(URL, FPS=30):
     cv2.destroyAllWindows()
 
 def ShowImage(URL):
-
-
 
         # Create window
         cv2.namedWindow(PROJECT_NAME, cv2.WINDOW_AUTOSIZE)

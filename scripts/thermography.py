@@ -11,7 +11,6 @@ import numpy as np
 from matplotlib import pyplot as plt
 from tkinter import Tk
 from tkinter.filedialog import askopenfilename
-from enum import Enum
 
 class Thermography():
 
@@ -30,7 +29,7 @@ class Thermography():
 		self.inertialParam = False
 		self.params = cv2.SimpleBlobDetector_Params()
 
-	def SetUpParams(self):
+	def setUpParams(self):
 		# Set filtering parameters 
 		# Initialize parameter settiing using cv2.SimpleBlobDetector 
 		#params = cv2.SimpleBlobDetector_Params() 
@@ -102,8 +101,8 @@ class Thermography():
   
 		return
 
-	def Process(self):
-		self.SetUpParams()
+	def process(self):
+		self.setUpParams()
 		self.mask()
 		self.counter()
 
@@ -122,10 +121,11 @@ def main():
 	# Ask user for file
 	picURL = askopenfilename()
 	root.destroy()
+
 	try:
 		# counter(picURL)
 		thermal = Thermography(picURL)
-		cv2.imshow("Stacked", thermal.Process())
+		cv2.imshow("Stacked", thermal.process())
 		cv2.waitKey(0)
 
 	except :
@@ -133,5 +133,3 @@ def main():
 
 if __name__ == "__main__":
 	main()
-
-
