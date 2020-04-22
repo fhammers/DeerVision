@@ -1,7 +1,8 @@
-/Thermal
-/internal
-/.vscode/
+Thermal/
+internal/
+scripts/__pycache__/
+.vscode/
+
 test.jpg
-/scripts/__pycache__/
-orthophoto.tif/
+orthophoto.tif
 logging.txt
