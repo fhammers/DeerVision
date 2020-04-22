@@ -2,3 +2,7 @@
 /internal
 /.vscode
 test.jpg
+
+
+/scripts/__pycache__
+orthophoto.tif

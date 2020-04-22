@@ -1,11 +1,13 @@
 import os
+import sys
 import json
 import requests
+import time
 
 
 class WebODMAPI:
 
-    def __init__(self, username='teshobt18', password='deer', PROJECT_ID=3,
+    def __init__(self, username='teshobt18', password='deer', PROJECT_ID=2,
                      PROJECT_NAME="deer_project",  ORTHO_RESOLUTION=24,
                      TASK_ID = None, URL='http://localhost:8000'):
 
@@ -14,7 +16,6 @@ class WebODMAPI:
         self.password = password
 
         self.PROJECT_ID = PROJECT_ID #use this to add modify tasks in the Neuvoo project
-        self.Task
         self.PROJECT_NAME = PROJECT_NAME # Use this to modify the current project
         self.ORTHO_RESOLUTION = ORTHO_RESOLUTION
         self.URL = 'http://localhost:8000'
@@ -27,23 +28,41 @@ class WebODMAPI:
 
     def authenticate(self):
 
+
+        request = ''
+
         try:
-            request  = requests.post(URL + '/api/token-auth/',
-                            data={'username': self.username,
-                                'password': self.password}).json()
+            request  = requests.post(self.URL + '/api/token-auth/', 
+                                data={'username': self.username,
+                                    'password': self.password}).json()
+
         except:
             print("Unable to authenticate")
-
-        if request:
+            return -1
+        finally:
             self.token =  request['token']
+            return self.token
+
+    def valid_image_file(self, file_path, filename):
+
+        if os.path.isdir(file_path):
+            return False
+        try:
+            file_name, ext = filename.split(".")
+        except ValueError:
+            return False
+        
+        if not file_name or ext != "JPG":
+            return False
+
+        return True
 
 
-    def load_images(self, file_name):
+    def load_images(self, file_dir):
 
         source = 'Thermal' # change directory name here according to relative directory needed 
             
-        dirs = os.listdir(file_name)
-
+        files = os.listdir(file_dir)
         regular_images = []
         thermal_images = []
         
@@ -52,21 +71,25 @@ class WebODMAPI:
         #     ('images', ('image1.jpg', open('images/DJI_0177.jpg', 'rb'), 'image/jpg')), 
         #     ('images', ('image2.jpg', open('images/DJI_0175.jpg', 'rb'), 'image/jpg')),
         # ]
-        for index, file in enumerate(dirs):
-            file_path = 'images/{}'.format(file)
-            data_file = ('images{}.jpg'.format(index), (file, open(file_path, 'rb'), 'image/jpg'))
-            if file.split('.')[-2][-1] == 'R':
-                self.thermal_images.append(data_file)
-            else:
-                self.regular_images.append(data_file)
-
+        for index, file in enumerate(files):
+            file_path = '{}/{}'.format(file_dir, file)
+            if self.valid_image_file(file_path, file):
+                data_file = ('images{}.jpg'.format(index + 1), (file, open(file_path, 'rb'), 'image/jpg'))
+                file_name, ext = file.split(".")
+              
+                image_type = file_name[-1]
+                print(data_file)
+                if image_type == "R":
+                    self.thermal_images.append(data_file)
+                else:
+                    self.regular_images.append(data_file)
         return regular_images
 
 
     def create_new_project(self, project_name):   
         # Use this to create a new peoject
-        res = requests.post('{}/api/projects/'.format(URL), 
-                            headers={'Authorization': 'JWT {}'.format(token)},
+        res = requests.post('{}/api/projects/'.format(self.URL), 
+                            headers={'Authorization': 'JWT {}'.format(self.token)},
                             data={'name': project_name}).json()
         project_id = res['id']
 
@@ -79,41 +102,52 @@ class WebODMAPI:
        # add a thermal_images task 
         #set up image resolution 
         options = json.dumps([
-            {'name': "orthophoto-resolution", 'value': self.}
+            {'name': "orthophoto-resolution", 'value': self.ORTHO_RESOLUTION}
         ])
 
         if thermal:
             images = self.thermal_images
         else:
             images = self.regular_images
-
-        res = requests.post(URL + '/api/projects/{}/tasks/'.format(self.PROJECT_ID), 
-                    headers={'Authorization': 'JWT {}'.format(token)},
+        print(images, self.PROJECT_ID)
+        
+        
+        res = requests.post(self.URL + '/api/projects/{}/tasks/'.format(self.PROJECT_ID), 
+                    headers={'Authorization': 'JWT {}'.format(self.token)},
                     files=images,
                     data={
                         'options': options
                     }
                   ).json()
 
-        self.task_id = res['id']
+
+        try:
+            self.task_id = res['id']
+        except TypeError:
+            print("Invalid images")
+            return 0
 
         return self.task_id
 
-    def get_stitch_status(self):
+    def get_stitch_status(self, task_id = None):
 
-        while True:
-            res = requests.get(URL +  '/api/projects/{}/tasks/{}/'.format(self.PROJECT, self.T), 
-                        headers={'Authorization': 'JWT {}'.format(token)}).json()
+    
+            res = requests.get(self.URL +  '/api/projects/{}/tasks/{}/'.format(self.PROJECT_ID, task_id),
+                        headers={'Authorization': 'JWT {}'.format(self.token)}).json()
 
-            if res['status'] == status_codes.COMPLETED:
-                print("Task has completed!")
-                break
-            elif res['status'] == status_codes.FAILED:
-                print("Task failed: {}".format(res))
-                sys.exit(1)
-            else:
-                print("Processing, hold on...")
-                time.sleep(3)
+            return res
+
+           
+
+    def download_tif(self, task_id):
+        res = requests.get(self.URL + "/api/projects/{}/tasks/{}/download/orthophoto.tif".format(self.PROJECT_ID, task_id), 
+                        headers={'Authorization': 'JWT {}'.format(self.token)},
+                        stream=True)
+        with open("orthophoto.tif", 'wb') as f:
+            for chunk in res.iter_content(chunk_size=1024): 
+                if chunk:
+                    f.write(chunk)
+        print("Saved ./orthophoto.tif")
 
 
 
