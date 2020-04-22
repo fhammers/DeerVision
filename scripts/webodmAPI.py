@@ -25,10 +25,10 @@ class WebODMAPI:
         self.regular_images = []
       
 
-    def authenticate(self)
+    def authenticate(self):
 
         try:
-            request  = requests.post(URL + '/api/token-auth/', 
+            request  = requests.post(URL + '/api/token-auth/',
                             data={'username': self.username,
                                 'password': self.password}).json()
         except:
@@ -74,7 +74,7 @@ class WebODMAPI:
         self.PROJECT_ID = project_id
 
 
-    def stitch_images(self, thermal=True)
+    def stitch_images(self, thermal=True):
 
        # add a thermal_images task 
         #set up image resolution 
@@ -85,7 +85,7 @@ class WebODMAPI:
         if thermal:
             images = self.thermal_images
         else:
-            images = 
+            images = self.regular_images
 
         res = requests.post(URL + '/api/projects/{}/tasks/'.format(self.PROJECT_ID), 
                     headers={'Authorization': 'JWT {}'.format(token)},
@@ -103,7 +103,7 @@ class WebODMAPI:
 
         while True:
             res = requests.get(URL +  '/api/projects/{}/tasks/{}/'.format(self.PROJECT, self.T 
-                        headers={'Authorization': 'JWT {}'.format(token)}).json()
+                        headers={'Authorization': 'JWT {}'.format(token)}).json())
 
             if res['status'] == status_codes.COMPLETED:
                 print("Task has completed!")
