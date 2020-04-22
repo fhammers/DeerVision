@@ -1,8 +1,10 @@
+#ignore these folders
 Thermal/
 internal/
 scripts/__pycache__/
 .vscode/
 
-test.jpg
-orthophoto.tif
-logging.txt
+# ignore all log/jpg/tif files
+*.log
+*.jpg
+*.tif
