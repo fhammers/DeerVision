@@ -2,12 +2,6 @@
 from tkinter import *
 from tkinter import filedialog
 
-
-
-
-
-
-
 class DeerVision:
     def __init__(self):
          
@@ -20,11 +14,8 @@ class DeerVision:
         self.window.geometry('600x200')
         btn = Button(self.window, text="Browse", command = self.load_file, width = 10).pack()
 
-
     def start(self):
         self.window.mainloop()
-
-
     
     def load_file(self):
         file_name = filedialog.askdirectory()
