@@ -22,9 +22,20 @@ def mask(URL):
 	image = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
 
 	# Sets the color that is being masked using HSV color format
-	
-	# mask = cv2.inRange(image, (0,50,200), (50,180,255)) #Red
-	mask = cv2.inRange(image, (0,0,200), (70,3,255)) #White
+	color = 'a'
+	cInput = False
+	color = input("Please select a color mask (r = red, w = white):\n")
+	while cInput == False:
+		if color == 'r':
+			mask = cv2.inRange(image, (0,50,200), (50,180,255)) #Red
+			cInput = True
+		elif color == 'w':
+			mask = cv2.inRange(image, (0,0,200), (70,3,255)) #White
+			cInput = True
+		else:	
+			print("Please enter r or w")
+			color = input("Please select a color mask (r = red, w = white):\n")
+
 	result = cv2.bitwise_and(result, result, mask=mask)
 	# blur = cv2.GaussianBlur(result,(3,3),0)
 	# mask_blur = cv2.GaussianBlur(mask,(7,7),0)
