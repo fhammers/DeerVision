@@ -102,8 +102,8 @@ class WebODMAPI:
     def get_stitch_status(self):
 
         while True:
-            res = requests.get(URL +  '/api/projects/{}/tasks/{}/'.format(self.PROJECT, self.T 
-                        headers={'Authorization': 'JWT {}'.format(token)}).json())
+            res = requests.get(URL +  '/api/projects/{}/tasks/{}/'.format(self.PROJECT, self.T), 
+                        headers={'Authorization': 'JWT {}'.format(token)}).json()
 
             if res['status'] == status_codes.COMPLETED:
                 print("Task has completed!")
