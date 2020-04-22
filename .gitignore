@@ -3,6 +3,8 @@
 .vscode/
 test.jpg
 
+# ignore all log files
+*.log
 
 /scripts/__pycache__/
 orthophoto.tif/
