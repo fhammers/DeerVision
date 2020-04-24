@@ -12,7 +12,7 @@ from matplotlib import pyplot as plt
 
 class Thermography():
 
-	def __init__(self, URL, colorMode = "white"):
+	def __init__(self, URL, colorMode):
 
 		self.URL = URL
 		self.colorMode = colorMode
@@ -42,7 +42,7 @@ class Thermography():
 
 		# Set Area filtering parameters (Area in pixels)
 		self.params.filterByArea = self.areaParam
-		self.params.minArea = 3
+		self.params.minArea = 20
 		
 		# Set Circularity filtering parameters (4*pi*Area/perimiter^2, circle = 1)
 		self.params.filterByCircularity = self.circularParam 
@@ -60,20 +60,45 @@ class Thermography():
 
 		return
 
-	def mask(self):
+	def colorMask(self):
 
 		# Creating a mask from red pixels
 		image = self.originalImage.copy()
-		cvrtColorImage = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
+		img_hsv = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
 
 		# Sets the color that is being masked using HSV color format
 		
 		if self.colorMode == "red": 
-			mask = cv2.inRange(image, (0,50,200), (50,180,255)) #Red
+			#mask = cv2.inRange(image, (0,50,200), (50,180,255)) #Red
+
+			#catch values on both H sides of hsv colormap
+			lower_red = np.array([0,50,50])
+			upper_red = np.array([10,255,255])
+			mask = cv2.inRange(img_hsv, lower_red, upper_red)
+
+			lower_red = np.array([170,50,50])
+			upper_red = np.array([180,255,255])
+			mask2 = cv2.inRange(img_hsv, lower_red, upper_red)
+
+			mask = mask+mask2
+
+			# output_img = image.copy()
+			# output_img[np.where(mask==0)] = 0
+
+			# output_hsv = img_hsv.copy()
+			# output_hsv[np.where(mask==0)] = 0
+
+			self.maskImage = cv2.bitwise_and(image, img_hsv, mask= mask)
+
+			#self.maskImage = output_hsv
+
+			return
+
 		if self.colorMode == "white":
-			mask = cv2.inRange(cvrtColorImage, (0,0,200), (70,3,255)) #White
+			mask = cv2.inRange(img_hsv, (0,0,200), (70,3,255)) #White
 
 		result = cv2.bitwise_and(image, image, mask=mask)
+
 		self.maskImage = result
 
 		return 
@@ -101,7 +126,7 @@ class Thermography():
 
 	def process(self):
 		self.setUpParams()
-		self.mask()
+		self.colorMask()
 		self.counter()
 
 		stack1 = np.hstack((self.originalImage, self.maskImage))

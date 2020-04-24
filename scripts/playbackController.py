@@ -10,8 +10,8 @@ PROJECT_NAME = 'IR Thermal Processing'
 
 class PlayBack(Thermography):
 
-    def __init__(self, image):
-        Thermography.__init__(self, image)
+    def __init__(self, image, colorMode = "white"):
+        Thermography.__init__(self, image, colorMode)
 
     def OnVidTrackbar(self, val):
         cap.set(cv2.CAP_PROP_POS_FRAMES, val)
@@ -116,7 +116,10 @@ def main():
     #picURL = askopenfilename()
     root.destroy()
 
-    player = PlayBack(picURL)
+    player = PlayBack(image=picURL, colorMode="red")
+    print(player.colorMode)
+    print(player.params.filterByArea)
+
     player.ExampleThreshold().show()
     #player.show()
 
