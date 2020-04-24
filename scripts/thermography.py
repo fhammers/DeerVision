@@ -9,8 +9,6 @@ import cv2 as cv2
 import sys
 import numpy as np
 from matplotlib import pyplot as plt
-from tkinter import Tk
-from tkinter.filedialog import askopenfilename
 
 class Thermography():
 
@@ -112,24 +110,6 @@ class Thermography():
 
 		return stacked
 
-
-def main():
-		# Hide root Tk window 
-	root = Tk()
-	root.withdraw()
-
-	# Ask user for file
-	picURL = askopenfilename()
-	root.destroy()
-
-	try:
-		# counter(picURL)
-		thermal = Thermography(picURL)
-		cv2.imshow("Stacked", thermal.process())
+	def show(self):
+		cv2.imshow("Stacked", self.process())
 		cv2.waitKey(0)
-
-	except :
-		print("Unexpected error:", sys.exc_info())
-
-if __name__ == "__main__":
-	main()
