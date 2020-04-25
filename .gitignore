@@ -3,6 +3,7 @@ Thermal/
 internal/
 scripts/__pycache__/
 .vscode/
+.idea/
 
 # ignore all log/jpg/tif files
 *.log
