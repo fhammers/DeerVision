@@ -1,15 +1,15 @@
 # {tkinter}
 from tkinter import *
-from tkinter import filedialog, Button
+from tkinter import filedialog, Button, messagebox
 
 # {WebODM}
 from webodmAPI import WebODMAPI
 
 # {Python}
 import time
+import requests
 import os
 from PIL import ImageTk, Image
-
 
 status_codes = {
     "QUEUED": 10,
@@ -19,10 +19,12 @@ status_codes = {
     "CANCELED": 50
 }
 
-
 class DeerVision(Tk):
     def __init__(self):
         super(DeerVision, self).__init__()
+
+        # flag to control upload frame
+        self.uploadFrameState = "disable"
 
         self.list_dir = ""
         directory = os.getcwd()
@@ -38,45 +40,97 @@ class DeerVision(Tk):
         self.iconLabel = Label(self, image=self.RI_img, bd=1)
         self.iconLabel.grid(column=0, row=0, columnspan=6)
 
-        # Add frame for selecting images
-        self.uploadFrame = LabelFrame(self, text="Begin Upload", bg="white", padx=50, pady=30)
-        self.uploadFrame.grid(column=0, row=1)
+        # Add initial frame
+        self.initFrame = LabelFrame(self, text="Project Details", bg="white", padx=50, pady=30)
+        self.initFrame.grid(column=0, row=1)
 
-        # Add buttons and padding
-        self.newBtn = Button(self.uploadFrame, text="Select Folder", pady=10, width=15, command=self.load_file)
-        self.newBtn.grid(column=0, row=1)
-        self.dummyLabel1 = Label(self.uploadFrame, bd=1, bg="white")
+        # Add buttons to initial frame
+        self.createProjectBtn = Button(self.initFrame, text="Create New Project", width=21,
+                                       command=self.createNewProject)
+        self.createProjectBtn.grid(column=0, row=1)
+        self.dummyLabel1 = Label(self.initFrame, bd=1, bg="white")
         self.dummyLabel1.grid(column=0, row=4)
+
+        # variable label for drop down
+        self.showExistingProjects = StringVar()
+        self.showExistingProjects.set("Select Existing Project")
+
+        '''
+        self.existingProjects = ""
+        res = ""
+
+        try:
+            res = requests.get('http://localhost:8000/api/projects/')
+        except:
+            print ("Unable to get projects")
+        finally:
+            #self.existingProjects = res
+            print (res)
+        '''
+
+        # Create drop down menu
+        self.dropDown = OptionMenu(self.initFrame, self.showExistingProjects, "Monday", "Tuesday")
+        self.dropDown.grid(column=0, row=7)
+
+        # showExistingProjects.get() - gets string for existing project
+
+        # Add upload frame
+        self.uploadFrame = LabelFrame(self, text="Begin Upload", bg="white", padx=50, pady=30)
+        self.uploadFrame.grid(column=4, row=1)
+
+        # Add buttons and padding for upload frame
+        self.newBtn = Button(self.uploadFrame, text="Select Folder", pady=10, width=15, command=self.loadFile)
+        self.newBtn.grid(column=0, row=1)
+        self.dummyLabel2 = Label(self.uploadFrame, bd=1, bg="white")
+        self.dummyLabel2.grid(column=0, row=4)
         self.webBtn = Button(self.uploadFrame, text="WebODM Settings", pady=10, width=15)
         self.webBtn.grid(column=0, row=7)
-        self.dummyLabel2 = Label(self.uploadFrame, bd=1, bg="white")
-        self.dummyLabel2.grid(column=0, row=10)
-        self.viewStitchBtn = Button(self.uploadFrame, text="View Stitch", pady=10, width=15, state=DISABLED)
-        self.viewStitchBtn.grid(column=0, row=13)
         self.dummyLabel3 = Label(self.uploadFrame, bd=1, bg="white")
-        self.dummyLabel3.grid(column=0, row=16)
-        self.submitBtn = Button(self.uploadFrame, text="Submit", pady=10, width=15, command=self.load_webODM)
+        self.dummyLabel3.grid(column=0, row=10)
+        self.viewStitchBtn = Button(self.uploadFrame, text="View Stitched Image", pady=10, width=15, state=DISABLED)
+        self.viewStitchBtn.grid(column=0, row=13)
+        self.dummyLabel4 = Label(self.uploadFrame, bd=1, bg="white")
+        self.dummyLabel4.grid(column=0, row=16)
+        self.submitBtn = Button(self.uploadFrame, text="Submit", pady=10, width=15, command=self.loadWebODM)
         self.submitBtn.grid(column=0, row=19)
 
+        # disable children until project details have been set
+        for child in self.uploadFrame.winfo_children():
+            child.configure(state=self.uploadFrameState)
+
+        # before api call we need to modify constructor with settings after changed
+
+        # WebODM Api Call
         self.odm_API = WebODMAPI()
 
+    def createNewProject(self):
+        self.addExistingBtn.configure(self.initFrame, text="clicked")
+        self.uploadFrameState = "normal"
+        return
+    '''
+    def addToExsitingProject(self):
+        return
+    '''
+    def selectProject(self):
+        return
 
-    def load_file(self):
+    def loadFile(self):
         file_name = filedialog.askdirectory(initialdir="./")
-        self.label = Label(self.uploadFrame, text="")
-        self.label.grid(column=1, row=2)
-        self.label.configure(text=file_name)
 
         if file_name:
             self.list_dir = file_name
+            self.pathLabel = Label(self.uploadFrame, text=file_name)
+            self.pathLabel.grid(column=0, row=3)
+
         else:
+            messagebox.showinfo("ERROR", "Invalid file directory, try again!")
             raise ValueError("Invalid file directory")
 
         return self.list_dir
 
-
-    def load_webODM(self):
+    def loadWebODM(self):
         auth = self.odm_API.authenticate()
+        print('Auth ' + auth)
 
         if not auth:
             # handle lack of authentication
@@ -89,11 +143,10 @@ class DeerVision(Tk):
 
         # get progress
         if task_id:
-            print("hello")
+            print('Task id' + task_id)
             self.get_status(task_id)
 
         self.odm_API.download_tif(task_id)
-
 
     def get_status(self, task_id):
         while True:

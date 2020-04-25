@@ -1,15 +1,16 @@
+# {Pytho}
 import os
-import sys
 import json
 import requests
-import time
+
+# {tkinter}
+from tkinter import messagebox
 
 
 class WebODMAPI:
-
-    def __init__(self, username='teshobt18', password='deer', PROJECT_ID=2,
+    def __init__(self, username='deer', password='deer', PROJECT_ID=2,
                      PROJECT_NAME="deer_project",  ORTHO_RESOLUTION=24,
-                     TASK_ID = None, URL='http://localhost:8000'):
+                     TASK_ID = None, URL="http://34.69.218.234:8000"):
 
         #auth
         self.username = username
@@ -18,29 +19,26 @@ class WebODMAPI:
         self.PROJECT_ID = PROJECT_ID #use this to add modify tasks in the Neuvoo project
         self.PROJECT_NAME = PROJECT_NAME # Use this to modify the current project
         self.ORTHO_RESOLUTION = ORTHO_RESOLUTION
-        self.URL = 'http://localhost:8000'
-        
+        self.URL = URL
 
         self.token = ""
         self.thermal_images  = []
         self.regular_images = []
-      
 
     def authenticate(self):
-
-
         request = ''
 
         try:
-            request  = requests.post(self.URL + '/api/token-auth/', 
+            request = requests.post(self.URL + '/api/token-auth/',
                                 data={'username': self.username,
                                     'password': self.password}).json()
 
         except:
             print("Unable to authenticate")
             return -1
+
         finally:
-            self.token =  request['token']
+            self.token = request['token']
             return self.token
 
     def valid_image_file(self, file_path, filename):
@@ -56,7 +54,6 @@ class WebODMAPI:
             return False
 
         return True
-
 
     def load_images(self, file_dir):
 
@@ -85,7 +82,6 @@ class WebODMAPI:
                     self.regular_images.append(data_file)
         return regular_images
 
-
     def create_new_project(self, project_name):   
         # Use this to create a new peoject
         res = requests.post('{}/api/projects/'.format(self.URL), 
@@ -95,7 +91,6 @@ class WebODMAPI:
 
         #set project id to that project
         self.PROJECT_ID = project_id
-
 
     def stitch_images(self, thermal=True):
 
@@ -111,7 +106,7 @@ class WebODMAPI:
             images = self.regular_images
         print(images, self.PROJECT_ID)
         
-        
+        # POST to create a new task on existing project
         res = requests.post(self.URL + '/api/projects/{}/tasks/'.format(self.PROJECT_ID), 
                     headers={'Authorization': 'JWT {}'.format(self.token)},
                     files=images,
@@ -130,14 +125,10 @@ class WebODMAPI:
         return self.task_id
 
     def get_stitch_status(self, task_id = None):
-
-    
             res = requests.get(self.URL +  '/api/projects/{}/tasks/{}/'.format(self.PROJECT_ID, task_id),
                         headers={'Authorization': 'JWT {}'.format(self.token)}).json()
 
             return res
-
-           
 
     def download_tif(self, task_id):
         res = requests.get(self.URL + "/api/projects/{}/tasks/{}/download/orthophoto.tif".format(self.PROJECT_ID, task_id), 
@@ -147,13 +138,5 @@ class WebODMAPI:
             for chunk in res.iter_content(chunk_size=1024): 
                 if chunk:
                     f.write(chunk)
+        messagebox.showinfo("Success", "Saved as orthophoto.tif")
         print("Saved ./orthophoto.tif")
-
-
-
-
-# print(res)
-# # task_id = res['id']
-# print(task_id)
-
-
