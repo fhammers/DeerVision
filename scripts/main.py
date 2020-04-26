@@ -7,7 +7,6 @@ from webodmAPI import WebODMAPI
 
 # {Python}
 import time
-import requests
 import os
 from PIL import ImageTk, Image
 
@@ -19,12 +18,16 @@ status_codes = {
     "CANCELED": 50
 }
 
+
 class DeerVision(Tk):
     def __init__(self):
         super(DeerVision, self).__init__()
 
         # flag to control upload frame
         self.uploadFrameState = "disable"
+
+        # WebODM Api Call
+        self.odm_API = WebODMAPI()
 
         self.list_dir = ""
         directory = os.getcwd()
@@ -42,76 +45,110 @@ class DeerVision(Tk):
 
         # Add initial frame
         self.initFrame = LabelFrame(self, text="Project Details", bg="white", padx=50, pady=30)
-        self.initFrame.grid(column=0, row=1)
+        self.initFrame.grid(column=2, row=1)
 
         # Add buttons to initial frame
-        self.createProjectBtn = Button(self.initFrame, text="Create New Project", width=21,
+        self.createProjectBtn = Button(self.initFrame, text="Create New Project", pady=10, width=30,
                                        command=self.createNewProject)
         self.createProjectBtn.grid(column=0, row=1)
         self.dummyLabel1 = Label(self.initFrame, bd=1, bg="white")
         self.dummyLabel1.grid(column=0, row=4)
+        self.webBtn = Button(self.initFrame, text="WebODM Settings", pady=10, width=30)
+        self.webBtn.grid(column=0, row=7)
+        self.dummyLabel2 = Label(self.initFrame, bd=1, bg="white")
+        self.dummyLabel2.grid(column=0, row=10)
+        self.addTask = Button(self.initFrame, text="Add New Task To Existing Project", pady=10, width=30,
+                              command=self.addToExsitingProject)
+        self.addTask.grid(column=0, row=13)
+        dummyLabel3 = Label(self.initFrame, bd=1, bg="white")
+        dummyLabel3.grid(column=0, row=16)
+        viewStitchBtn = Button(self.initFrame, text="View Stitched Image", pady=10, width=15, state=DISABLED)
+        viewStitchBtn.grid(column=0, row=19)
 
-        # variable label for drop down
-        self.showExistingProjects = StringVar()
-        self.showExistingProjects.set("Select Existing Project")
 
         '''
-        self.existingProjects = ""
-        res = ""
-
-        try:
-            res = requests.get('http://localhost:8000/api/projects/')
-        except:
-            print ("Unable to get projects")
-        finally:
-            #self.existingProjects = res
-            print (res)
-        '''
-
-        # Create drop down menu
-        self.dropDown = OptionMenu(self.initFrame, self.showExistingProjects, "Monday", "Tuesday")
-        self.dropDown.grid(column=0, row=7)
+        
 
         # showExistingProjects.get() - gets string for existing project
-
+        
         # Add upload frame
-        self.uploadFrame = LabelFrame(self, text="Begin Upload", bg="white", padx=50, pady=30)
-        self.uploadFrame.grid(column=4, row=1)
-
-        # Add buttons and padding for upload frame
-        self.newBtn = Button(self.uploadFrame, text="Select Folder", pady=10, width=15, command=self.loadFile)
-        self.newBtn.grid(column=0, row=1)
-        self.dummyLabel2 = Label(self.uploadFrame, bd=1, bg="white")
-        self.dummyLabel2.grid(column=0, row=4)
-        self.webBtn = Button(self.uploadFrame, text="WebODM Settings", pady=10, width=15)
-        self.webBtn.grid(column=0, row=7)
-        self.dummyLabel3 = Label(self.uploadFrame, bd=1, bg="white")
-        self.dummyLabel3.grid(column=0, row=10)
-        self.viewStitchBtn = Button(self.uploadFrame, text="View Stitched Image", pady=10, width=15, state=DISABLED)
-        self.viewStitchBtn.grid(column=0, row=13)
-        self.dummyLabel4 = Label(self.uploadFrame, bd=1, bg="white")
-        self.dummyLabel4.grid(column=0, row=16)
-        self.submitBtn = Button(self.uploadFrame, text="Submit", pady=10, width=15, command=self.loadWebODM)
-        self.submitBtn.grid(column=0, row=19)
-
+        
+        '''
+        '''
+        
+        
         # disable children until project details have been set
         for child in self.uploadFrame.winfo_children():
             child.configure(state=self.uploadFrameState)
-
+        '''
         # before api call we need to modify constructor with settings after changed
 
-        # WebODM Api Call
-        self.odm_API = WebODMAPI()
-
     def createNewProject(self):
-        self.addExistingBtn.configure(self.initFrame, text="clicked")
-        self.uploadFrameState = "normal"
+
+        def submitNewProject():
+            project_name = name.get("1.0", END)
+            messagebox.showinfo("Success", "Created new project: " + project_name)
+            return self.odm_API.create_new_project(self, project_name)
+
+        newProjectWindow = Toplevel()
+
+        # Initialize window
+        newProjectWindow.title("Create New Project")
+        newProjectWindow.geometry("500x300")
+        newProjectWindow.configure(background="white")
+        newProjectWindow.resizable(False, False)
+
+        # Create input field
+        Label(newProjectWindow, text=" Project Name", bg="white").grid(column=1, row=1, pady=20, padx=20)
+        name = Text(newProjectWindow, height=1, width=30, borderwidth=5)
+        name.grid(column=2, row=1)
+        Label(newProjectWindow, text="Description", bg="white").grid(column=1, row=6, pady=20, padx=20)
+        description = Text(newProjectWindow, height=5, width=30, borderwidth=5)
+        description.grid(column=2, row=6)
+        submitBtn = Button(newProjectWindow, text="Submit", bg="white", command=submitNewProject)
+        submitBtn.grid(column=2, row=10)
+
         return
-    '''
+
     def addToExsitingProject(self):
-        return
-    '''
-    def selectProject(self):
+        existingProjectWindow = Toplevel()
+
+        # Initialize window
+        existingProjectWindow.title("Projects")
+        existingProjectWindow.geometry("300x300")
+        existingProjectWindow.configure(background="white")
+        existingProjectWindow.resizable(False, False)
+
+        # Add upload frame
+        uploadFrame = LabelFrame(existingProjectWindow, text="Begin Upload", bg="white", padx=50, pady=30)
+        uploadFrame.pack()
+
+        # variable label for drop down
+        showExistingProjects = StringVar()
+        showExistingProjects.set("Select Existing Project")
+
+        auth = self.odm_API.authenticate()
+
+        obj = self.odm_API.get_list_of_projects(auth)
+        projects = []
+
+        for project in obj['results']:
+            projects.append(project['name'])
+
+        # Create drop down menu
+        dropDown = OptionMenu(uploadFrame, showExistingProjects, *projects)
+        dropDown.grid(column=0, row=1)
+        dummyLabel1 = Label(uploadFrame, bd=1, bg="white")
+        dummyLabel1.grid(column=0, row=4)
+
+        # Add buttons and padding for upload frame
+        newBtn = Button(uploadFrame, text="Select Folder", width=21, command=self.loadFile)
+        newBtn.grid(column=0, row=7)
+        dummyLabel2 = Label(uploadFrame, bd=1, bg="white")
+        dummyLabel2.grid(column=0, row=10)
+        submitBtn = Button(uploadFrame, text="Submit", width=21, command=self.loadWebODM)
+        submitBtn.grid(column=0, row=13)
+
         return
 
     def loadFile(self):
