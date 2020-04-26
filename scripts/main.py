@@ -23,9 +23,6 @@ class DeerVision(Tk):
     def __init__(self):
         super(DeerVision, self).__init__()
 
-        # flag to control upload frame
-        self.uploadFrameState = "disable"
-
         # WebODM Api Call
         self.odm_API = WebODMAPI()
 
@@ -43,6 +40,7 @@ class DeerVision(Tk):
 
         # project name
         self.project_name = ""
+        self.existingProjects = StringVar()
 
         # Adding RI logo to window
         self.RI_img = ImageTk.PhotoImage(Image.open(directory + "/images/RI_Logo.jpg"))
@@ -66,10 +64,10 @@ class DeerVision(Tk):
         self.addTask = Button(self.initFrame, text="Add New Task To Existing Project", pady=10, width=30,
                               command=self.uploadProjectHelper)
         self.addTask.grid(column=0, row=13)
-        dummyLabel3 = Label(self.initFrame, bd=1, bg="white")
-        dummyLabel3.grid(column=0, row=16)
-        viewStitchBtn = Button(self.initFrame, text="View Stitched Image", pady=10, width=15, state=DISABLED)
-        viewStitchBtn.grid(column=0, row=19)
+        self.dummyLabel3 = Label(self.initFrame, bd=1, bg="white")
+        self.dummyLabel3.grid(column=0, row=16)
+        self.viewStitchBtn = Button(self.initFrame, text="View Stitched Image", pady=10, width=15, state=DISABLED)
+        self.viewStitchBtn.grid(column=0, row=19)
 
     def createNewProject(self):
 
@@ -77,7 +75,11 @@ class DeerVision(Tk):
             project_name = name.get("1.0", END)
             messagebox.showinfo("Success", "Created new project: " + project_name)
             self.project_name = project_name
-            #self.odm_API.create_new_project(self, project_name)
+
+            # create new project
+            auth = self.odm_API.authenticate()
+            self.odm_API.create_new_project(project_name, auth)
+
             newProjectWindow.destroy()
             self.uploadProject()
 
@@ -98,8 +100,6 @@ class DeerVision(Tk):
         description.grid(column=2, row=6)
         submitBtn = Button(newProjectWindow, text="Submit", bg="white", command=submitNewProject)
         submitBtn.grid(column=2, row=10)
-
-        return
 
     def uploadProjectHelper(self):
         self.enableDropDown = True
@@ -122,8 +122,7 @@ class DeerVision(Tk):
         if (self.enableDropDown):
 
             # variable label for drop down
-            existingProjects = StringVar()
-            existingProjects.set("Select Existing Project")
+            self.existingProjects.set("Select Existing Project")
 
             auth = self.odm_API.authenticate()
 
@@ -134,15 +133,10 @@ class DeerVision(Tk):
                 projects.append(project['name'])
 
             # Create drop down menu
-            dropDown = OptionMenu(uploadFrame, existingProjects, *projects)
+            dropDown = OptionMenu(uploadFrame, self.existingProjects, *projects)
             dropDown.grid(column=0, row=1)
             dummyLabel1 = Label(uploadFrame, bd=1, bg="white")
             dummyLabel1.grid(column=0, row=4)
-
-            print('Existing project: ' + existingProjects.get())
-
-            # Disable widget
-            self.enableDropDown = False
 
         # Add buttons and padding for upload frame
         newBtn = Button(uploadFrame, text="Select Folder", width=21, command=self.loadFile)
@@ -159,17 +153,19 @@ class DeerVision(Tk):
 
         if file_name:
             self.list_dir = file_name
-            self.pathLabel = Label(self.uploadFrame, text=file_name)
-            self.pathLabel.grid(column=0, row=3)
-
+            messagebox.showinfo("Directory", "Selected directory: " + self.list_dir)
         else:
-            messagebox.showinfo("ERROR", "Invalid file directory, try again!")
+            messagebox.showinfo("Error", "Invalid file directory, try again!")
             raise ValueError("Invalid file directory")
 
         return self.list_dir
 
     def loadWebODM(self):
         auth = self.odm_API.authenticate()
+
+        if self.enableDropDown:
+            self.project_name = self.existingProjects.get()
+            self.enableDropDown = False
 
         if self.project_name == "":
             return messagebox.showinfo("ERROR", "Project name not properly set")
@@ -224,35 +220,3 @@ class DeerVision(Tk):
 if __name__ == "__main__":
     deer_process = DeerVision()
     deer_process.mainloop()
-
-    # deer_process.start()
-
-    ## start tkinkter root window
-    ## gui calls here
-    # startGUI()
-
-    ##if gui is event driven then we need it in a loop to check for a key press to jump out of loop,
-    # or tie it to a main function, I'll leave this to the programmer, maybe that event calls main.main()
-
-    ##scraper scripts to separate thermal from non-theral files, I think we should have a checkbox option
-    # for which images they would like stitched, thermal should be preset to true with non-thermals set as false
-    # scrape images and pass them to webodm api
-    # change output of scraper to be correct input for webODM api
-    # webODM_container = scraper()
-
-    # run webodm scripts based off gui selected parameters if there are any
-    # webODMapi.post()
-
-    # is there a way to check for stitch progress through api?
-
-    # store returned objects
-    # thermalTiff = webODMapi.request()
-
-    # run tiff image through deer counter sequence, this should be a single call
-    # deerImage = counter.findDeer()
-
-    # get nuimber of deer found and present that image
-
-    # have a button on gui that takes you to where new image where deer displayed is found
-
-    # clean up tkinter and exit
