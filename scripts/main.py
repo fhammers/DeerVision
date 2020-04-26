@@ -32,11 +32,17 @@ class DeerVision(Tk):
         self.list_dir = ""
         directory = os.getcwd()
 
+        # global flag to hide widget
+        self.enableDropDown = False
+
         # initialize tkinter window
         self.title("Remote Intelligence")
         self.geometry("700x700")
         self.configure(background="white")
         self.resizable(False, False)
+
+        # project name
+        self.project_name = ""
 
         # Adding RI logo to window
         self.RI_img = ImageTk.PhotoImage(Image.open(directory + "/images/RI_Logo.jpg"))
@@ -58,37 +64,22 @@ class DeerVision(Tk):
         self.dummyLabel2 = Label(self.initFrame, bd=1, bg="white")
         self.dummyLabel2.grid(column=0, row=10)
         self.addTask = Button(self.initFrame, text="Add New Task To Existing Project", pady=10, width=30,
-                              command=self.addToExsitingProject)
+                              command=self.uploadProjectHelper)
         self.addTask.grid(column=0, row=13)
         dummyLabel3 = Label(self.initFrame, bd=1, bg="white")
         dummyLabel3.grid(column=0, row=16)
         viewStitchBtn = Button(self.initFrame, text="View Stitched Image", pady=10, width=15, state=DISABLED)
         viewStitchBtn.grid(column=0, row=19)
 
-
-        '''
-        
-
-        # showExistingProjects.get() - gets string for existing project
-        
-        # Add upload frame
-        
-        '''
-        '''
-        
-        
-        # disable children until project details have been set
-        for child in self.uploadFrame.winfo_children():
-            child.configure(state=self.uploadFrameState)
-        '''
-        # before api call we need to modify constructor with settings after changed
-
     def createNewProject(self):
 
         def submitNewProject():
             project_name = name.get("1.0", END)
             messagebox.showinfo("Success", "Created new project: " + project_name)
-            return self.odm_API.create_new_project(self, project_name)
+            self.project_name = project_name
+            #self.odm_API.create_new_project(self, project_name)
+            newProjectWindow.destroy()
+            self.uploadProject()
 
         newProjectWindow = Toplevel()
 
@@ -110,7 +101,11 @@ class DeerVision(Tk):
 
         return
 
-    def addToExsitingProject(self):
+    def uploadProjectHelper(self):
+        self.enableDropDown = True
+        self.uploadProject()
+
+    def uploadProject(self):
         existingProjectWindow = Toplevel()
 
         # Initialize window
@@ -123,23 +118,31 @@ class DeerVision(Tk):
         uploadFrame = LabelFrame(existingProjectWindow, text="Begin Upload", bg="white", padx=50, pady=30)
         uploadFrame.pack()
 
-        # variable label for drop down
-        showExistingProjects = StringVar()
-        showExistingProjects.set("Select Existing Project")
+        # Separate for uploading to existing project
+        if (self.enableDropDown):
 
-        auth = self.odm_API.authenticate()
+            # variable label for drop down
+            existingProjects = StringVar()
+            existingProjects.set("Select Existing Project")
 
-        obj = self.odm_API.get_list_of_projects(auth)
-        projects = []
+            auth = self.odm_API.authenticate()
 
-        for project in obj['results']:
-            projects.append(project['name'])
+            obj = self.odm_API.get_list_of_projects(auth)
+            projects = []
 
-        # Create drop down menu
-        dropDown = OptionMenu(uploadFrame, showExistingProjects, *projects)
-        dropDown.grid(column=0, row=1)
-        dummyLabel1 = Label(uploadFrame, bd=1, bg="white")
-        dummyLabel1.grid(column=0, row=4)
+            for project in obj['results']:
+                projects.append(project['name'])
+
+            # Create drop down menu
+            dropDown = OptionMenu(uploadFrame, existingProjects, *projects)
+            dropDown.grid(column=0, row=1)
+            dummyLabel1 = Label(uploadFrame, bd=1, bg="white")
+            dummyLabel1.grid(column=0, row=4)
+
+            print('Existing project: ' + existingProjects.get())
+
+            # Disable widget
+            self.enableDropDown = False
 
         # Add buttons and padding for upload frame
         newBtn = Button(uploadFrame, text="Select Folder", width=21, command=self.loadFile)
@@ -167,7 +170,9 @@ class DeerVision(Tk):
 
     def loadWebODM(self):
         auth = self.odm_API.authenticate()
-        print('Auth ' + auth)
+
+        if self.project_name == "":
+            return messagebox.showinfo("ERROR", "Project name not properly set")
 
         if not auth:
             # handle lack of authentication
@@ -175,8 +180,16 @@ class DeerVision(Tk):
 
         self.odm_API.load_images(self.list_dir)
 
+        # get project id for current project
+        obj = self.odm_API.get_list_of_projects(auth)
+        project_id = ""
+
+        for project in obj['results']:
+            if project['name'] == self.project_name:
+                project_id = project['id']
+
         # stitch images
-        task_id = self.odm_API.stitch_images()
+        task_id = self.odm_API.stitch_images(project_id, auth)
 
         # get progress
         if task_id:

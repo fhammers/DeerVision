@@ -84,7 +84,7 @@ class WebODMAPI:
         # set project id to that project
         self.PROJECT_ID = project_id
 
-    def stitch_images(self, thermal=True):
+    def stitch_images(self, project_id, auth_token, thermal=True):
 
         # add a thermal_images task
         # set up image resolution
@@ -99,8 +99,8 @@ class WebODMAPI:
         print(images, self.PROJECT_ID)
 
         # POST to create a new task on existing project
-        res = requests.post(self.URL + '/api/projects/{}/tasks/'.format(self.PROJECT_ID),
-                            headers={'Authorization': 'JWT {}'.format(self.token)},
+        res = requests.post(self.URL + '/api/projects/{}/tasks/'.format(project_id),
+                            headers={'Authorization': 'JWT {}'.format(auth_token)},
                             files=images,
                             data={
                                 'options': options
