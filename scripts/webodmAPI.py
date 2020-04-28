@@ -75,13 +75,13 @@ class WebODMAPI:
 
     def create_new_project(self, project_name, auth_token):
         # Use this to create a new peoject
-        res = requests.post('{}/api/projects/'.format(self.URL),
-                            headers={'Authorization': 'JWT {}'.format(auth_token)},
-                            data={'name': project_name}).json()
-        project_id = res['id']
-
-        # set project id to that project
-        self.project_id = project_id
+        requests.post('{}/api/projects/'.format(self.URL),
+                      headers={'Authorization': 'JWT {}'.format(auth_token)},
+                      data={'name': project_name}).json()
+        # project_id = res['id']
+        #
+        # # set project id to that project
+        # self.project_id = project_id
 
     def stitch_images(self, project_id, auth_token, thermal=True):
 
@@ -121,8 +121,8 @@ class WebODMAPI:
     def get_list_of_projects(self, auth):
         try:
             projects = requests.get('http://34.69.218.234:8000' + '/api/projects',
-                               headers={'Authorization': 'JWT {}'.format(auth)},
-                               data={'username': 'deer', 'password': 'deer'}).json()
+                                    headers={'Authorization': 'JWT {}'.format(auth)},
+                                    data={'username': 'deer', 'password': 'deer'}).json()
         except:
             print('Unable to get projects')
             return -1

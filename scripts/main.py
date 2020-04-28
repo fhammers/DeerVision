@@ -38,12 +38,13 @@ class DeerVision(Tk):
         self.configure(background="white")
         self.resizable(False, False)
 
-        # project name
+        # project name and id
         self.project_name = ""
+        self.project_id = ""
         self.existingProjects = StringVar()
 
         # Adding RI logo to window
-        self.RI_img = ImageTk.PhotoImage(Image.open(directory + "/images/RI_Logo.jpg"))
+        self.RI_img = ImageTk.PhotoImage(Image.open(os.path.join(directory, 'images', 'RI_Logo.jpg')))
         self.iconLabel = Label(self, image=self.RI_img, bd=1)
         self.iconLabel.grid(column=0, row=0, columnspan=6)
 
@@ -57,13 +58,13 @@ class DeerVision(Tk):
         self.createProjectBtn.grid(column=0, row=1)
         self.dummyLabel1 = Label(self.initFrame, bd=1, bg="white")
         self.dummyLabel1.grid(column=0, row=4)
-        self.webBtn = Button(self.initFrame, text="WebODM Settings", pady=10, width=30)
-        self.webBtn.grid(column=0, row=7)
-        self.dummyLabel2 = Label(self.initFrame, bd=1, bg="white")
-        self.dummyLabel2.grid(column=0, row=10)
         self.addTask = Button(self.initFrame, text="Add New Task To Existing Project", pady=10, width=30,
                               command=self.uploadProjectHelper)
-        self.addTask.grid(column=0, row=13)
+        self.addTask.grid(column=0, row=7)
+        self.dummyLabel2 = Label(self.initFrame, bd=1, bg="white")
+        self.dummyLabel2.grid(column=0, row=10)
+        self.webBtn = Button(self.initFrame, text="WebODM Settings", pady=10, width=30)
+        self.webBtn.grid(column=0, row=13)
         self.dummyLabel3 = Label(self.initFrame, bd=1, bg="white")
         self.dummyLabel3.grid(column=0, row=16)
         self.viewStitchBtn = Button(self.initFrame, text="View Stitched Image", pady=10, width=15, state=DISABLED)
@@ -73,15 +74,19 @@ class DeerVision(Tk):
 
         def submitNewProject():
             project_name = name.get("1.0", END)
-            messagebox.showinfo("Success", "Created new project: " + project_name)
-            self.project_name = project_name
 
             # create new project
             auth = self.odm_API.authenticate()
-            self.odm_API.create_new_project(project_name, auth)
 
-            newProjectWindow.destroy()
-            self.uploadProject()
+            try:
+                self.odm_API.create_new_project(project_name, auth)
+            except:
+                messagebox.showinfo("Error", "Unable to create a new project. Please try again")
+            else:
+                messagebox.showinfo("Success", "Created new project: " + project_name)
+                self.project_name = project_name
+                newProjectWindow.destroy()
+                self.uploadProject()
 
         newProjectWindow = Toplevel()
 
@@ -106,16 +111,20 @@ class DeerVision(Tk):
         self.uploadProject()
 
     def uploadProject(self):
-        existingProjectWindow = Toplevel()
+        projectsWindow = Toplevel()
+
+        def destroyProjectsWindow():
+            projectsWindow.destroy()
+            self.loadWebODM()
 
         # Initialize window
-        existingProjectWindow.title("Projects")
-        existingProjectWindow.geometry("300x300")
-        existingProjectWindow.configure(background="white")
-        existingProjectWindow.resizable(False, False)
+        projectsWindow.title("Projects")
+        projectsWindow.geometry("300x300")
+        projectsWindow.configure(background="white")
+        projectsWindow.resizable(False, False)
 
         # Add upload frame
-        uploadFrame = LabelFrame(existingProjectWindow, text="Begin Upload", bg="white", padx=50, pady=30)
+        uploadFrame = LabelFrame(projectsWindow, text="Begin Upload", bg="white", padx=50, pady=30)
         uploadFrame.pack()
 
         # Separate for uploading to existing project
@@ -143,10 +152,8 @@ class DeerVision(Tk):
         newBtn.grid(column=0, row=7)
         dummyLabel2 = Label(uploadFrame, bd=1, bg="white")
         dummyLabel2.grid(column=0, row=10)
-        submitBtn = Button(uploadFrame, text="Submit", width=21, command=self.loadWebODM)
+        submitBtn = Button(uploadFrame, text="Submit", width=21, command=destroyProjectsWindow)
         submitBtn.grid(column=0, row=13)
-
-        return
 
     def loadFile(self):
         file_name = filedialog.askdirectory(initialdir="./")
@@ -178,41 +185,58 @@ class DeerVision(Tk):
 
         # get project id for current project
         obj = self.odm_API.get_list_of_projects(auth)
-        project_id = ""
 
+        # ISSUE -- not getting project ID
         for project in obj['results']:
             if project['name'] == self.project_name:
-                project_id = project['id']
+                print("It worked")
+                self.project_id = project['id']
 
         # stitch images
-        task_id = self.odm_API.stitch_images(project_id, auth)
+        print(self.project_name)
+        print(self.project_id)
+        task_id = self.odm_API.stitch_images(self.project_id, auth)
 
         # get progress
         if task_id:
-            print('Task id' + task_id)
             self.get_status(task_id)
 
         self.odm_API.download_tif(task_id)
 
+    # FIX -- status message here
     def get_status(self, task_id):
+        statusWindow = Toplevel()
+
+        statusWindow.title("Status Window")
+        statusWindow.geometry("300x300")
+        statusWindow.configure(background="white")
+        statusWindow.resizable(False, False)
+
+        frame = LabelFrame(statusWindow, bg="white", padx=50, pady=30)
+        frame.pack()
+
+        text = Text(frame, width=21)
+        btn = Button(frame, text="Finish", width=21)
+        btn.grid(column=0, row=7)
+
         while True:
-            self.text.delete(1.0, END)
+            text.delete(1.0, END)
             res = self.odm_API.get_stitch_status(task_id)
             if res['status'] == status_codes["COMPLETED"]:
                 print("Task has completed!")
-                self.text.insert(END, "Task has completed!")
+                text.insert(END, "Task has completed!")
                 break
             elif res['status'] == status_codes["FAILED"]:
                 print("Task failed: {}".format(res))
-                self.text.insert(END, "Task failed: {}".format(res))
+                text.insert(END, "Task failed: {}".format(res))
                 sys.exit(1)
             elif res['status'] == status_codes["QUEUED"]:
                 print("Task has been qeued")
-                self.text.insert(END, "Task has been qeued")
+                text.insert(END, "Task has been qeued")
                 time.sleep(3)
             else:
                 print("Processing, hold on...")
-                self.text.insert(END, "Processing, hold on...")
+                text.insert(END, "Processing, hold on...")
                 time.sleep(3)
             self.update_idletasks()
 
