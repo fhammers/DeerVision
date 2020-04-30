@@ -10,8 +10,8 @@ PROJECT_NAME = 'IR Thermal Processing'
 
 class PlayBack(Thermography):
 
-    def __init__(self, image, colorMode = "white"):
-        Thermography.__init__(self, image, colorMode)
+    def __init__(self, imageURL, colorMode = "white"):
+        Thermography.__init__(self, imageURL, colorMode)
 
     def OnVidTrackbar(self, val):
         cap.set(cv2.CAP_PROP_POS_FRAMES, val)
@@ -72,40 +72,70 @@ class PlayBack(Thermography):
         images = [img, thresh1, thresh2, thresh3, thresh4, thresh5]
 
         for i in range(6):
-            plt.subplot(2,3,i+1),plt.imshow(images[i],'gray')
+            plt.subplot(2,3,i+1), plt.imshow(images[i],'gray')
+            plt.title(titles[i])
+            plt.xticks([]), plt.yticks([])
+
+        return plt
+
+    def CreateWindow(self):
+
+        img = self.originalImage
+        # mask = self.maskImage
+        # blob = self.blobImage
+        # canny = self.blobImage
+
+        titles = ['Original','Mask','Blob','Canny']
+
+        self.CreateFrames()
+
+        images = [img, img, img, img]
+
+        for i in range(4):
+            plt.subplot(2,2,i+1),plt.imshow(images[i],'gray')
             plt.title(titles[i])
             plt.xticks([]),plt.yticks([])
 
         return plt
 
-    def CreateFrames(self, frame, MINTHRESH=100, MAXTHRESH=255, RESIZE_FAC = 0.8):
+    def Create(self):
+
+        plt.imshow(self.update(), 'gray')
+        plt.title("Converted Image")
+        plt.xticks([]),plt.yticks([])
+
+        return
+
+    def CreateFrames(self, MINTHRESH=100, MAXTHRESH=255):
 
         # Create canny
-        gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+        gray = cv2.cvtColor(self.originalImage, cv2.COLOR_BGR2GRAY)
         canny = cv2.Canny(gray, MINTHRESH, MAXTHRESH)
 
         # Negative frame (bits flipped)
-        neg = ~frame
+        #neg = ~self.originalImage
 
         # Convert canny to correct color dimensionality
         canny3d = cv2.cvtColor(canny, cv2.COLOR_GRAY2BGR)
 
         # Overlay canny with original
-        added = cv2.addWeighted(frame, 0.5, canny3d, 0.5, 1)
+        added = cv2.addWeighted(self.originalImage, 0.5, canny3d, 0.5, 1)
+
+        self.cannyImage = added
 
         # Resize frames to the correct size
-        frame = cv2.resize(frame, None, fx = RESIZE_FAC, fy = RESIZE_FAC)
-        neg = cv2.resize(neg, None, fx= RESIZE_FAC, fy= RESIZE_FAC)
-        canny3d = cv2.resize(canny3d, None, fx = RESIZE_FAC, fy = RESIZE_FAC)
-        added = cv2.resize(added, None, fx = RESIZE_FAC, fy = RESIZE_FAC)
+        #frame = cv2.resize(frame, None, fx = RESIZE_FAC, fy = RESIZE_FAC)
+        #neg = cv2.resize(neg, None, fx= RESIZE_FAC, fy= RESIZE_FAC)
+        #canny3d = cv2.resize(canny3d, None, fx = RESIZE_FAC, fy = RESIZE_FAC)
+        #added = cv2.resize(added, None, fx = RESIZE_FAC, fy = RESIZE_FAC)
 
         # Create stacked views
-        stack1 = np.hstack((frame, neg))
-        stack2 = np.hstack((added, canny3d))
-        stacked = np.vstack((stack1, stack2))
+        #stack1 = np.hstack((frame, neg))
+        #stack2 = np.hstack((added, canny3d))
+        #stacked = np.vstack((stack1, stack2))
 
         # Update stacked view
-        return stacked
+        return 
 
 def main():
 
@@ -116,13 +146,12 @@ def main():
     #picURL = askopenfilename()
     root.destroy()
 
-    player = PlayBack(image=picURL, colorMode="red")
-    print(player.colorMode)
-    print(player.params.filterByArea)
+    player = PlayBack(imageURL=picURL, colorMode="red")
 
-    player.ExampleThreshold().show()
-    #player.show()
-
+    #player.ExampleThreshold().show()
+    player.show()
+    #player.CreateWindow().show()
+    #player.Create().show()
 
 if __name__ == "__main__":
     main()

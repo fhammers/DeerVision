@@ -19,9 +19,10 @@ class Thermography():
 		self.originalImage = cv2.imread(URL)
 		self.maskImage = ""
 		self.blobImage = ""
+		self.cannyImage = ""
 		self.number_of_blobs = 0
 		self.colorParam = True
-		self.areaParam = False
+		self.areaParam = True
 		self.circularParam = False
 		self.convexParam = False
 		self.inertialParam = False
@@ -42,7 +43,7 @@ class Thermography():
 
 		# Set Area filtering parameters (Area in pixels)
 		self.params.filterByArea = self.areaParam
-		self.params.minArea = 20
+		self.params.minArea = 15
 		
 		# Set Circularity filtering parameters (4*pi*Area/perimiter^2, circle = 1)
 		self.params.filterByCircularity = self.circularParam 
