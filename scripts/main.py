@@ -79,7 +79,7 @@ class DeerVision(Tk):
             auth = self.odm_API.authenticate()
 
             try:
-                self.odm_API.create_new_project(project_name, auth)
+                self.project_id = self.odm_API.create_new_project(project_name, auth)
             except:
                 messagebox.showinfo("Error", "Unable to create a new project. Please try again")
             else:
@@ -189,13 +189,12 @@ class DeerVision(Tk):
         # ISSUE -- not getting project ID
         for project in obj['results']:
             if project['name'] == self.project_name:
-                print("It worked")
                 self.project_id = project['id']
-
-        # stitch images
-        print(self.project_name)
+                
         print(self.project_id)
+        # stitch images
         task_id = self.odm_API.stitch_images(self.project_id, auth)
+        print(task_id)
 
         # get progress
         if task_id:
@@ -215,13 +214,13 @@ class DeerVision(Tk):
         frame = LabelFrame(statusWindow, bg="white", padx=50, pady=30)
         frame.pack()
 
-        text = Text(frame, width=21)
+        text = Text(statusWindow, width=21)
         btn = Button(frame, text="Finish", width=21)
         btn.grid(column=0, row=7)
 
         while True:
             text.delete(1.0, END)
-            res = self.odm_API.get_stitch_status(task_id)
+            res = self.odm_API.get_stitch_status(self.project_id, task_id)
             if res['status'] == status_codes["COMPLETED"]:
                 print("Task has completed!")
                 text.insert(END, "Task has completed!")

@@ -75,9 +75,11 @@ class WebODMAPI:
 
     def create_new_project(self, project_name, auth_token):
         # Use this to create a new peoject
-        requests.post('{}/api/projects/'.format(self.URL),
+        response = requests.post('{}/api/projects/'.format(self.URL),
                       headers={'Authorization': 'JWT {}'.format(auth_token)},
                       data={'name': project_name}).json()
+
+        return response['id']
         # project_id = res['id']
         #
         # # set project id to that project
@@ -112,9 +114,12 @@ class WebODMAPI:
 
         return self.task_id
 
-    def get_stitch_status(self, task_id=None):
-        res = requests.get(self.URL + '/api/projects/{}/tasks/{}/'.format(self.project_id, task_id),
-                           headers={'Authorization': 'JWT {}'.format(self.token)}).json()
+    def get_stitch_status(self, project_id, task_id=None):
+        print(self.token)
+        print(self.URL)
+        print(self.token)
+        res = requests.get('http://34.69.218.234:8000' + '/api/projects/{}/tasks/{}/'.format(project_id, task_id),  
+                headers={'Authorization': 'JWT {}'.format(self.token)}).json()
 
         return res
 
