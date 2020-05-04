@@ -2,6 +2,12 @@
 from tkinter import *
 from tkinter import filedialog, Button, messagebox
 
+# {playback}
+from playbackController import PlayBack
+
+# {thermography}
+from thermography import Thermography
+
 # {WebODM}
 from webodmAPI import WebODMAPI
 
@@ -67,7 +73,8 @@ class DeerVision(Tk):
         self.webBtn.grid(column=0, row=13)
         self.dummyLabel3 = Label(self.initFrame, bd=1, bg="white")
         self.dummyLabel3.grid(column=0, row=16)
-        self.viewStitchBtn = Button(self.initFrame, text="View Stitched Image", pady=10, width=15, state=DISABLED)
+        self.viewStitchBtn = Button(self.initFrame, text="View Stitched Image", pady=10, width=15, 
+                                        command=self.RunPlayback)
         self.viewStitchBtn.grid(column=0, row=19)
 
     def createNewProject(self):
@@ -201,6 +208,11 @@ class DeerVision(Tk):
             self.get_status(task_id)
 
         self.odm_API.download_tif(task_id)
+
+    def RunPlayback(self):
+        picURL = r"C:\Users\micha\OneDrive\Juniata\Advanced Lab\Thermal Content\Deer Images\DJI_0353_R.JPG"
+        Thermo = Thermography(imageURL=picURL, colorMode = "red")
+        PlayBack("Play Back", Thermo)
 
     # FIX -- status message here
     def get_status(self, task_id):
