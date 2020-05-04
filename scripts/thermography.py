@@ -7,26 +7,31 @@
 
 import cv2 as cv2
 import sys
+import os
 import numpy as np
 from matplotlib import pyplot as plt
 
 class Thermography():
 
-	def __init__(self, URL, colorMode):
+	def __init__(self, imageURL, colorMode = "white"):
 
-		self.URL = URL
+		self.URL = imageURL
 		self.colorMode = colorMode
-		self.originalImage = cv2.imread(URL)
+		self.originalImage = cv2.imread(imageURL)
 		self.maskImage = ""
 		self.blobImage = ""
 		self.cannyImage = ""
-		self.number_of_blobs = 0
+		self.numberBlobs = 0
 		self.colorParam = True
 		self.areaParam = True
 		self.circularParam = False
 		self.convexParam = False
 		self.inertialParam = False
 		self.params = cv2.SimpleBlobDetector_Params()
+
+		self.setUpParams()
+		self.colorMask()
+		self.process()
 
 	def setUpParams(self):
 		# Set filtering parameters 
@@ -70,8 +75,7 @@ class Thermography():
 		# Sets the color that is being masked using HSV color format
 		
 		if self.colorMode == "red": 
-			#mask = cv2.inRange(image, (0,50,200), (50,180,255)) #Red
-
+			
 			#catch values on both H sides of hsv colormap
 			lower_red = np.array([0,50,50])
 			upper_red = np.array([10,255,255])
@@ -83,26 +87,14 @@ class Thermography():
 
 			mask = mask+mask2
 
-			# output_img = image.copy()
-			# output_img[np.where(mask==0)] = 0
-
-			# output_hsv = img_hsv.copy()
-			# output_hsv[np.where(mask==0)] = 0
-
 			self.maskImage = cv2.bitwise_and(image, img_hsv, mask= mask)
-
-			#self.maskImage = output_hsv
-
-			return
 
 		if self.colorMode == "white":
 			mask = cv2.inRange(img_hsv, (0,0,200), (70,3,255)) #White
 
-		result = cv2.bitwise_and(image, image, mask=mask)
+			mask = cv2.bitwise_and(image, image, mask=mask)
 
-		self.maskImage = result
-
-		return 
+			self.maskImage = mask
 
 	def counter(self): 
 		
@@ -121,21 +113,24 @@ class Thermography():
 		self.blobImage = cv2.drawKeypoints(self.originalImage, keypoints, blank, (0, 0, 255),
 					cv2.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS) 
 		
-		self.number_of_blobs = len(keypoints) 
+		self.numberBlobs = len(keypoints) 
   
-		return
+		cv2.imwrite("blobImage.jpg",self.blobImage)
 
 	def process(self):
 		self.setUpParams()
 		self.colorMask()
 		self.counter()
 
-		stack1 = np.hstack((self.originalImage, self.maskImage))
-		stack2 = np.hstack((self.blobImage, self.maskImage))
-		stacked = np.vstack((stack1, stack2))
+	def getOriginalImage(self):
+		return self.originalImage
 
-		return stacked
+	def getMaskImage(self):
+		return self.maskImage
 
-	def show(self):
-		cv2.imshow("Stacked", self.process())
-		cv2.waitKey(0)
+	def getBlobImage(self):
+		return self.blobImage
+
+	def getNumberBlobs(self):
+		return self.numberBlobs
+		

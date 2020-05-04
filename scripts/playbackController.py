@@ -1,157 +1,91 @@
-import cv2
 import numpy as np
 import time
-from tkinter import Tk
+import tkinter
+from tkinter import *
+from tkinter.ttk import *
+import tkinter.font as tkFont
 from tkinter.filedialog import askopenfilename
 from thermography import Thermography
+from canvasViewer import CanvasImage
 from matplotlib import pyplot as plt
+import PIL
+from PIL import Image, ImageTk
 
-PROJECT_NAME = 'IR Thermal Processing'
 
 class PlayBack(Thermography):
+    def __init__(self, windowTitle, thermo):
+        #create thermo object
+        self.thermo = thermo
 
-    def __init__(self, imageURL, colorMode = "white"):
-        Thermography.__init__(self, imageURL, colorMode)
+        #store images from thermo object and w/h
+        self.orig_img = thermo.originalImage
+        self.image = self.orig_img
+        self.imgWidth = self.image.shape[1]
+        self.imgHeight = self.image.shape[0]
 
-    def OnVidTrackbar(self, val):
-        cap.set(cv2.CAP_PROP_POS_FRAMES, val)
-        ret, frame = cap.read()
-        view = CreateFrames(frame)
-        cv2.imshow(PROJECT_NAME, view)
-        return
+        #create master tkinter window
+        self.master = Toplevel()
+        self.master.title(windowTitle)
 
-    def ShowVideo(self, URL, FPS=30):
-        # Bind video file
-        cap = cv2.VideoCapture(URL)
-        VID_FRAMES = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
+        self.master.grid_rowconfigure(1, weight=1)
+        self.master.grid_columnconfigure(0, weight=1)
 
-        # Create window
-        cv2.namedWindow(PROJECT_NAME, cv2.WINDOW_AUTOSIZE)
+        #create main frames
+        self.topFrame = Frame(self.master)
+        self.midFrameL = Frame(self.master)
+        self.midFrameR = Frame(self.master)
+        self.btmFrame = Frame(self.master)
 
-        # Create trackbars
-        cv2.createTrackbar('Frame', PROJECT_NAME, 0, VID_FRAMES, OnVidTrackbar)
+        self.fontStyle = tkFont.Font(family="Lucida Grande", size=16)
 
-        while(True):
+        #deer label and number of blobs detected
+        self.deerLabel = Label(self.topFrame, text = "Number of Deer:", font=self.fontStyle).\
+                    grid(row= 0, column = 0, pady = 2)
+        self.deerCount = Label(self.topFrame, text = str(self.thermo.getNumberBlobs()), font=self.fontStyle).\
+                    grid(row =0, column = 1, pady = 2)
+        
+        #image canvas
+        self.canvas = Canvas(self.midFrameL, width = self.imgWidth, height = self.imgHeight)
+        self.image = PIL.ImageTk.PhotoImage(image = PIL.Image.fromarray(self.image))
+        self.canvasImage = self.canvas.create_image(0, 0, image=self.image, anchor=tkinter.NW)
+        #self.canvas = CanvasImage(self.midFrame, self.thermo.URL)  # create widget
+        self.canvas.grid(row=0, column=0)
 
-            # Check for user input during playback
-            key = cv2.waitKey(1)
+        self.viewLabel= Label(self.midFrameR, text = "View Selection").grid(row=0, column =1)
+        
+        self.viewSelector = Combobox(self.midFrameR, 
+                            values=[
+                                    "Thermal", 
+                                    "Mask",
+                                    "Blob",])
+        self.viewSelector.current(0)
+        self.viewSelector.grid(row=1, column=1)
+        self.viewSelector.bind("<<ComboboxSelected>>", self.changeView)
+    
+        self.topFrame.grid(row=0)
+        self.midFrameL.grid(row=1, column =0)
+        self.midFrameR.grid(row=1, column =1)
+        self.btmFrame.grid(row=3)
 
-            if key == ord('q'): #quits
-                break
+        self.master.mainloop()
 
-            if key == ord('p'): #pauses
-                cv2.waitKey(-1) #waits until another key is pressed
-
-            # Get next frame from feed
-            ret, frame = cap.read()
-
-            # Perform cv2 operations
-            view = CreateFrames(frame)
-
-            cv2.imshow(PROJECT_NAME, view)
-
-            # FPS Controller (kinda)
-            time.sleep(1/FPS)
-
-        # Release binds and destroy for clean exit
-        cap.release()
-        cv2.destroyAllWindows()
-
-    def ExampleThreshold(self, minThresh=200, maxThresh=255):
-
-        img = self.originalImage
-
-        ret,thresh1 = cv2.threshold(img,minThresh,maxThresh,cv2.THRESH_BINARY)
-        ret,thresh2 = cv2.threshold(img,minThresh,maxThresh,cv2.THRESH_BINARY_INV)
-        ret,thresh3 = cv2.threshold(img,minThresh,maxThresh,cv2.THRESH_TRUNC)
-        ret,thresh4 = cv2.threshold(img,minThresh,maxThresh,cv2.THRESH_TOZERO)
-        ret,thresh5 = cv2.threshold(img,minThresh,maxThresh,cv2.THRESH_TOZERO_INV)
-
-        titles = ['Original Image','BINARY','BINARY_INV','TRUNC','TOZERO','TOZERO_INV']
-
-        images = [img, thresh1, thresh2, thresh3, thresh4, thresh5]
-
-        for i in range(6):
-            plt.subplot(2,3,i+1), plt.imshow(images[i],'gray')
-            plt.title(titles[i])
-            plt.xticks([]), plt.yticks([])
-
-        return plt
-
-    def CreateWindow(self):
-
-        img = self.originalImage
-        # mask = self.maskImage
-        # blob = self.blobImage
-        # canny = self.blobImage
-
-        titles = ['Original','Mask','Blob','Canny']
-
-        self.CreateFrames()
-
-        images = [img, img, img, img]
-
-        for i in range(4):
-            plt.subplot(2,2,i+1),plt.imshow(images[i],'gray')
-            plt.title(titles[i])
-            plt.xticks([]),plt.yticks([])
-
-        return plt
-
-    def Create(self):
-
-        plt.imshow(self.update(), 'gray')
-        plt.title("Converted Image")
-        plt.xticks([]),plt.yticks([])
-
-        return
-
-    def CreateFrames(self, MINTHRESH=100, MAXTHRESH=255):
-
-        # Create canny
-        gray = cv2.cvtColor(self.originalImage, cv2.COLOR_BGR2GRAY)
-        canny = cv2.Canny(gray, MINTHRESH, MAXTHRESH)
-
-        # Negative frame (bits flipped)
-        #neg = ~self.originalImage
-
-        # Convert canny to correct color dimensionality
-        canny3d = cv2.cvtColor(canny, cv2.COLOR_GRAY2BGR)
-
-        # Overlay canny with original
-        added = cv2.addWeighted(self.originalImage, 0.5, canny3d, 0.5, 1)
-
-        self.cannyImage = added
-
-        # Resize frames to the correct size
-        #frame = cv2.resize(frame, None, fx = RESIZE_FAC, fy = RESIZE_FAC)
-        #neg = cv2.resize(neg, None, fx= RESIZE_FAC, fy= RESIZE_FAC)
-        #canny3d = cv2.resize(canny3d, None, fx = RESIZE_FAC, fy = RESIZE_FAC)
-        #added = cv2.resize(added, None, fx = RESIZE_FAC, fy = RESIZE_FAC)
-
-        # Create stacked views
-        #stack1 = np.hstack((frame, neg))
-        #stack2 = np.hstack((added, canny3d))
-        #stacked = np.vstack((stack1, stack2))
-
-        # Update stacked view
-        return 
-
+    def changeView(self, event):
+        view = self.viewSelector.get()
+        if view == "Thermal":
+            self.image = PIL.ImageTk.PhotoImage(image = PIL.Image.fromarray(self.thermo.getOriginalImage()))
+        if view == "Mask":
+            self.image = PIL.ImageTk.PhotoImage(image = PIL.Image.fromarray(self.thermo.getMaskImage()))
+        if view == "Blob":
+            self.image = PIL.ImageTk.PhotoImage(image = PIL.Image.fromarray(self.thermo.getBlobImage()))
+        self.canvas.itemconfig(self.canvasImage, image = self.image)
+            
 def main():
-
-    root = Tk()
+    root = tkinter.Tk()
     root.withdraw()
 
     picURL = r"C:\Users\micha\OneDrive\Juniata\Advanced Lab\Thermal Content\Deer Images\DJI_0353_R.JPG"
-    #picURL = askopenfilename()
-    root.destroy()
-
-    player = PlayBack(imageURL=picURL, colorMode="red")
-
-    #player.ExampleThreshold().show()
-    player.show()
-    #player.CreateWindow().show()
-    #player.Create().show()
-
+    Thermo = Thermography(imageURL=picURL, colorMode = "red")
+    PlayBack("Play Back", Thermo)
+    
 if __name__ == "__main__":
     main()
