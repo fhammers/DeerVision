@@ -35,46 +35,49 @@ class PlayBack(Thermography):
         self.master.grid_columnconfigure(0, weight=1)
 
         #create main frames
-        self.topFrame = Frame(self.master)
-        self.midFrameL = Frame(self.master)
-        self.midFrameR1 = Frame(self.master)
-        self.midFrameR2 = Frame(self.master)
-        self.btmFrame = Frame(self.master)
+        self.left = Frame(self.master)
+        self.rightTop = Frame(self.master)
+        self.rightBottom = Frame(self.master)
 
-        #font style
-        self.fontStyle = tkFont.Font(family="Lucida Grande", size=16)
+        #styling
+        self.fontStyle = tkFont.Font(family="Lucida Grande", size=12)
+        self.padx = (15,15)
+        self.pady = (10,10)
 
         #deer label and number of blobs detected
-        self.deerLabel = Label(self.topFrame, text = "Number of Deer:", font=self.fontStyle).\
-                    grid(row= 0, column = 0, pady = 2)
-        self.deerCount = Label(self.topFrame, textvariable = self.deerFound, font=self.fontStyle).\
-                    grid(row =0, column = 1, pady = 2)
+        self.deerLabel = Label(self.rightTop, text = "Number of Deer:", font=self.fontStyle)
+        self.deerLabel.grid(row= 1, column = 0, pady = 30)
+        self.deerCount = Label(self.rightTop, textvariable = self.deerFound, font=self.fontStyle)
+        self.deerCount.grid(row =1, column = 1, pady = 30)
         self.deerFound.set(str(self.thermo.getNumberBlobs()))
 
         #image canvas
-        self.canvas = Canvas(self.midFrameL, width = self.imgWidth, height = self.imgHeight)
+        self.canvas = Canvas(self.left, width = self.imgWidth, height = self.imgHeight)
         self.image = PIL.ImageTk.PhotoImage(image = PIL.Image.fromarray(self.image))
         self.canvasImage = self.canvas.create_image(0, 0, image=self.image, anchor=tkinter.NW)
         #self.canvas = CanvasImage(self.midFrame, self.thermo.URL)  # create widget
         self.canvas.grid(row=0, column=0)
 
         #mask options labelframe
-        self.maskMenu = LabelFrame(self.midFrameR1, text = "Mask Options")
+        self.maskMenu = LabelFrame(self.rightTop, text = "Mask Options")
         self.maskMenu.grid(row=0, column=0)
 
         self.blobsCheck = Checkbutton(self.maskMenu, text = "Enable Blobs", \
                                             variable = self.enableBlobs, command = self.changeView)
-        self.blobsCheck.grid(row=1, column =0)
+        self.blobsCheck.grid(row=1, column =0, pady = self.pady)
 
+        self.scaleLabel = Label(self.maskMenu, text = "Minimum Blob Area")
+        self.scaleLabel.grid(row =2, column =0, pady = (5,5))
         self.blobScale = Scale(self.maskMenu, from_= 1, to = 25, command = self.changeView)
-        self.blobScale.grid(row=2, column =0)
+        self.blobScale.grid(row=3, column =0)
         self.blobScaleValue = Label(self.maskMenu, textvariable = self.areaScaleValue)
-        self.blobScaleValue.grid(row=2, column=1)
+        self.blobScaleValue.grid(row=3, column=1)
 
         #view selector
-        self.viewLabel= Label(self.midFrameR2, text = "View Selection").grid(row=1, column =0)
+        self.viewLabel= Label(self.rightBottom, text = "View Selection")
+        self.viewLabel.grid(row=1, column =0)
         
-        self.viewSelector = Combobox(self.midFrameR2, 
+        self.viewSelector = Combobox(self.rightBottom, 
                             values=["Thermal", 
                                     "Mask",])
         self.viewSelector.grid(row=2, column=0)
@@ -84,14 +87,14 @@ class PlayBack(Thermography):
         self.areaScaleValue.set(str(int(self.blobScale.get())))
         self.blobScale.set(self.thermo.minAreaParam)
         self.viewSelector.current(0)
+        self.enableBlobs.set(True)
 
         #frame placement
-        self.topFrame.grid(row=0)
-        self.midFrameL.grid(row=1, column =0, rowspan =2, padx =(15,15))
-        self.midFrameR1.grid(row=1, column =1, padx =(15,15))
-        self.midFrameR2.grid(row=2, column=1,padx =(15,15))
-        self.btmFrame.grid(row=3, pady=5)
+        self.left.grid(row=0, column =0, rowspan =2, padx = self.padx, pady = self.pady)
+        self.rightTop.grid(row=0, column =1, padx = self.padx, pady = self.pady)
+        self.rightBottom.grid(row=1, column=1,padx = self.padx, pady = self.pady)
 
+        self.changeView()
         self.master.mainloop()
 
     def update(self):
