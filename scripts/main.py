@@ -212,7 +212,7 @@ class DeerVision(Tk):
     def RunPlayback(self):
         picURL = r"C:\Users\micha\OneDrive\Juniata\Advanced Lab\Thermal Content\Deer Images\DJI_0353_R.JPG"
         Thermo = Thermography(imageURL=picURL, colorMode = "red")
-        PlayBack("Play Back", Thermo)
+        PlayBack(self.project_name, Thermo)
 
     # FIX -- status message here
     def get_status(self, task_id):
