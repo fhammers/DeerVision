@@ -69,11 +69,12 @@ class DeerVision(Tk):
         self.addTask.grid(column=0, row=7)
         self.dummyLabel2 = Label(self.initFrame, bd=1, bg="white")
         self.dummyLabel2.grid(column=0, row=10)
-        self.webBtn = Button(self.initFrame, text="WebODM Settings", pady=10, width=30)
+        self.webBtn = Button(self.initFrame, text="WebODM Settings", pady=10, width=30,
+                             command=self.webODMSettings)
         self.webBtn.grid(column=0, row=13)
         self.dummyLabel3 = Label(self.initFrame, bd=1, bg="white")
         self.dummyLabel3.grid(column=0, row=16)
-        self.viewStitchBtn = Button(self.initFrame, text="View Stitched Image", pady=10, width=15, 
+        self.viewStitchBtn = Button(self.initFrame, text="View Stitched Image", pady=10, width=30,
                                         command=self.RunPlayback)
         self.viewStitchBtn.grid(column=0, row=19)
 
@@ -162,6 +163,53 @@ class DeerVision(Tk):
         submitBtn = Button(uploadFrame, text="Submit", width=21, command=destroyProjectsWindow)
         submitBtn.grid(column=0, row=13)
 
+    def webODMSettings(self):
+        profileSettingsWindow = Toplevel()
+
+        #def saveChanges():
+            # post request to update user settings
+
+        #def cancel():
+            # destroy window
+
+        # initialize window
+        profileSettingsWindow.title("Profile")
+        profileSettingsWindow.geometry("500x300")
+        profileSettingsWindow.configure(background="white")
+        profileSettingsWindow.resizable(False, False)
+
+        # get user info
+        auth = self.odm_API.authenticate()
+        user_info = self.odm_API.get_user(2, auth)
+
+        # set user properties
+        uNameVar = StringVar()
+        uNameVar.set(user_info['username'])
+        fNameVar = StringVar()
+        fNameVar.set(user_info['first_name'])
+        lNameVar = StringVar()
+        lNameVar.set(user_info['last_name'])
+        emailVar = StringVar()
+        emailVar.set(user_info['email'])
+
+        # Create input field
+        Label(profileSettingsWindow, text="Username", bg="white").grid(column=1, row=1, pady=20, padx=20)
+        userName = Entry(profileSettingsWindow, textvariable=uNameVar, bg='white', width=30)
+        userName.grid(column=2, row=1)
+        Label(profileSettingsWindow, text="First Name", bg="white").grid(column=1, row=4, pady=20, padx=20)
+        firstName = Entry(profileSettingsWindow, textvariable=fNameVar, bg='white', width=30)
+        firstName.grid(column=2, row=4)
+        Label(profileSettingsWindow, text="Last Name", bg="white").grid(column=1, row=7, pady=20, padx=20)
+        lastName = Entry(profileSettingsWindow, textvariable=lNameVar, bg='white', width=30)
+        lastName.grid(column=2, row=7)
+        Label(profileSettingsWindow, text="Email    ", bg="white").grid(column=1, row=10, pady=20, padx=20)
+        email = Entry(profileSettingsWindow, textvariable=emailVar, bg='white', width=30)
+        email.grid(column=2, row=10)
+        saveBtn = Button(profileSettingsWindow, text="Save Changes", bg="white", command=saveChanges)
+        saveBtn.grid(column=2, row=13)
+        saveBtn = Button(profileSettingsWindow, text="Cancel", bg="white", command=cancel)
+        saveBtn.grid(column=2, row=16)
+
     def loadFile(self):
         file_name = filedialog.askdirectory(initialdir="./")
 
@@ -197,11 +245,9 @@ class DeerVision(Tk):
         for project in obj['results']:
             if project['name'] == self.project_name:
                 self.project_id = project['id']
-                
-        print(self.project_id)
+
         # stitch images
         task_id = self.odm_API.stitch_images(self.project_id, auth)
-        print(task_id)
 
         # get progress
         if task_id:
@@ -210,8 +256,8 @@ class DeerVision(Tk):
         self.odm_API.download_tif(task_id)
 
     def RunPlayback(self):
-        picURL = r"C:\Users\micha\OneDrive\Juniata\Advanced Lab\Thermal Content\Deer Images\DJI_0353_R.JPG"
-        Thermo = Thermography(imageURL=picURL, colorMode = "red")
+        picURL = self.directory + '/orthophoto.tif'
+        Thermo = Thermography(imageURL=picURL, colorMode="red")
         PlayBack(self.project_name, Thermo)
 
     # FIX -- status message here

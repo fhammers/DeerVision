@@ -52,6 +52,20 @@ class WebODMAPI:
 
         return True
 
+    def get_user(self, user_id, auth_token):
+        res = {}
+
+        try:
+            user_request = requests.post('http://34.69.218.234:8000' + '/api/admin/users/{}'.format(user_id),
+                                         headers={'Authorization': 'JWT {}'.format(auth_token)}).json()
+        except:
+            print("Unable to get users")
+
+        for key in user_request:
+            if key == 'username' or key == 'first_name' or key == 'last_name' or key == 'email':
+                res[key] = user_request[key]
+        return res
+
     def load_images(self, file_dir):
         source = 'Thermal'  # change directory name here according to relative directory needed
 
