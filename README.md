@@ -19,17 +19,8 @@ How to install the necessary dependencies for DeerVision
 Step1
 
 ```
-Give the example
+Example here
 ```
-
-Step2
-
-```
-until finished
-```
-
-End with an example of getting some data out of the system or using it for a little demo
-
 
 ## Built With
 
