@@ -123,7 +123,7 @@ class Thermography():
 
 		# Draw blobs on our image as red circles 
 		if self.drawBlobs:  
-		 	self.image = cv2.drawKeypoints(self.baseImage, self.keypoints, self.blank, (0, 0, 255),
+		 	self.image = cv2.drawKeypoints(self.baseImage, self.keypoints, self.blank, (0, 100, 100),
 					cv2.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS)
 		else:
 			self.image = self.baseImage	

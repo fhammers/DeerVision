@@ -79,7 +79,7 @@ class PlayBack(Thermography):
         
         self.viewSelector = Combobox(self.rightBottom, 
                             values=["Thermal", 
-                                    "Mask",])
+                                    "Mask"])
         self.viewSelector.grid(row=2, column=0)
         self.viewSelector.bind("<<ComboboxSelected>>", self.changeView)
 
