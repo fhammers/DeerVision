@@ -8,7 +8,7 @@ These instructions will get you a copy of the project up and running on your loc
 
 ### Prerequisites
 
-A list of required libraries used by DeerVision can be found [here]((https://github.com/michaellyoungg/DeerVision/requirements.txt)
+A list of required libraries used by DeerVision can be found [here](https://github.com/michaellyoungg/DeerVision/requirements.txt)
 
 
 
