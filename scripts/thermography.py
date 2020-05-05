@@ -18,12 +18,17 @@ class Thermography():
 		self.URL = imageURL
 		self.colorMode = colorMode
 		self.originalImage = cv2.imread(imageURL)
-		self.maskImage = ""
-		self.blobImage = ""
-		self.cannyImage = ""
+		self.image = self.originalImage
+		self.maskImage = self.originalImage
+		self.baseImage = self.originalImage
+		self.view = "original"
+		self.keypoints = ""
+		self.blank = np.zeros((1, 1))
 		self.numberBlobs = 0
-		self.colorParam = True
+		self.drawBlobs = False
+		self.colorParam = False
 		self.areaParam = True
+		self.minAreaParam = 15
 		self.circularParam = False
 		self.convexParam = False
 		self.inertialParam = False
@@ -48,7 +53,7 @@ class Thermography():
 
 		# Set Area filtering parameters (Area in pixels)
 		self.params.filterByArea = self.areaParam
-		self.params.minArea = 15
+		self.params.minArea = self.minAreaParam
 		
 		# Set Circularity filtering parameters (4*pi*Area/perimiter^2, circle = 1)
 		self.params.filterByCircularity = self.circularParam 
@@ -106,31 +111,44 @@ class Thermography():
 			detector = cv2.SimpleBlobDetector_create(self.params) 
 			
 		# Detect blobs 
-		keypoints = detector.detect(self.maskImage) 
+		self.keypoints = detector.detect(self.maskImage) 
 		
+		self.numberBlobs = len(self.keypoints) 
+
+	def viewer(self):
+		if self.view == "Thermal":
+			self.baseImage = self.originalImage
+		if self.view == "Mask":
+			self.baseImage = self.maskImage
+
 		# Draw blobs on our image as red circles 
-		blank = np.zeros((1, 1))  
-		self.blobImage = cv2.drawKeypoints(self.originalImage, keypoints, blank, (0, 0, 255),
-					cv2.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS) 
+		if self.drawBlobs:  
+		 	self.image = cv2.drawKeypoints(self.baseImage, self.keypoints, self.blank, (0, 0, 255),
+					cv2.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS)
+		else:
+			self.image = self.baseImage	
 		
-		self.numberBlobs = len(keypoints) 
-  
-		cv2.imwrite("blobImage.jpg",self.blobImage)
+	def setView(self, view):
+		self.view = view
 
 	def process(self):
 		self.setUpParams()
 		self.colorMask()
 		self.counter()
+		self.viewer()
 
-	def getOriginalImage(self):
-		return self.originalImage
-
-	def getMaskImage(self):
-		return self.maskImage
-
-	def getBlobImage(self):
-		return self.blobImage
+	def getImage(self):
+		return self.image
 
 	def getNumberBlobs(self):
 		return self.numberBlobs
-		
+	
+	def getBlobArea(self):
+		return self.areaParam
+
+	def setBlob(self, value):
+		self.drawBlobs = value
+
+	def setBlobArea(self, value):
+		self.minAreaParam = value
+		self.process()
