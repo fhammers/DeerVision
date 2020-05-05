@@ -38,7 +38,7 @@ End with an example of getting some data out of the system or using it for a lit
 
 ## Authors
 
-* **Michael Young** - *Initial work* - [michaellyoungg](https://github.com/michaellyoungg)
+* **Michael Young** - *Product Design and Development Lead* - [michaellyoungg](https://github.com/michaellyoungg)
 * **Martin Berger** - *Computer Vision algorithms* - [Mautty97](https://github.com/Mautty97)
 * **Kaleb Gebrekirstos** - *Front end and overall commits* - [ksgebrekirstos98](https://github.com/ksgebrekirstos98)
 * **Beakal Tiliksew Teshome** - *Back end cloud confiuragtion and API's* - [btree1970](https://github.com/btree1970)
