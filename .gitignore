@@ -1,6 +1,7 @@
 #ignore these folders
 Thermal/
 internal/
+deerapp/
 scripts/__pycache__/
 .vscode/
 .idea/

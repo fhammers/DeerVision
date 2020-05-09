@@ -16,10 +16,21 @@ A list of required libraries used by DeerVision can be found [here](https://gith
 
 How to install the necessary dependencies for DeerVision
 
-Step1
+Set up a virtualenv
 
 ```
-Example here
+pip install virtualenv
+```
+Setup virtual environment  
+```
+virtualenv deerapp
+```
+
+Activate virtualenv and install requriements
+```
+source deerapp/bin/activate
+
+pip install -r requirements.txt
 ```
 
 ## Built With
